@@ -1,0 +1,34 @@
+{
+  "name": "permacomputing-club-monorepo",
+  "version": "1.0.0",
+  "description": "A simple website built from Are.na channel content",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf build slug-mappings.json && ts-node index.ts",
+    "preview": "serve build",
+    "build:preview": "npm run build && npm run preview",
+    "clean": "rimraf build dist slug-mappings.json node_modules/.cache"
+  },
+  "keywords": [
+    "are.na",
+    "website",
+    "typescript",
+    "static-site-generator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "are.na": "^0.1.5",
+    "dotenv": "^16.3.1",
+    "marked": "^9.1.0"
+  },
+  "devDependencies": {
+    "@types/marked": "^5.0.1",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

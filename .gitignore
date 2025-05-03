@@ -1,0 +1,31 @@
+# System files
+# ------------
+
+.DS_Store
+
+# Lock files
+# ---------------
+
+.lock
+package-lock.json
+/node_modules
+
+# Editors
+# (sensitive workspace files)
+# ---------------------------
+
+*.sublime-workspace
+/.vscode
+
+# Build Files
+# ---------------
+
+/build
+
+# -------------SECURITY-------------
+# NEVER publish these files via Git:
+# -------------SECURITY-------------
+
+# Environment Variables
+# ---------------
+.env
