@@ -30,7 +30,7 @@ A site to keep projects, notes, thoughts and club updates about permacomputing.
     - `marked` - Markdown parsing
     - `ts-node` - TypeScript execution
     - `rimraf` - Cross-platform directory removal
-2. `npm run preview:preview` - Build and preview in one step
+2. `npm run build:preview` - Build and preview in one step
 
 ### Scripts
 
@@ -47,7 +47,7 @@ A site to keep projects, notes, thoughts and club updates about permacomputing.
 
 ## Credits
 
-Using Elliott Cost's Website Templates Styling (https://sites.elliott.computer/html-templates): Memory site was inspired by Piper Haywood (https://piperhaywood.com) and Zinzy Waleson Geene (https://www.zinzy.website) websites.
+Inspired by Elliott Cost's Website Template Styling (https://sites.elliott.computer/html-templates): Memory site was inspired by Piper Haywood (https://piperhaywood.com) and Zinzy Waleson Geene (https://www.zinzy.website) websites.
 
 ## Project Structure
 
@@ -63,7 +63,7 @@ your-project/
 │ ├── css/
 │ │ └── style.css # Main stylesheet
 │ └── js/
-│ └── main.js # Client-side JavaScript
+│ └── main.js # Client-side JavaScript (tags)
 ├── views/ # HTML templates
 │ ├── layouts/
 │ │ └── main.html # Main layout template
@@ -72,11 +72,18 @@ your-project/
 │ │ └── item.html # Individual item template
 │ └── partials/
 │ └── navigation.html # Navigation partial
+├── utils/ # Shared utilities
+│ ├── file.ts # Directory logic
+│ └── index.ts # Markdown rendering, custom functionality
+├── scripts/ # Server-side scripts
+│ ├── arena.ts # Fetches are.na content
+│ ├── slug.ts # Maps slugs
+│ └── template.ts # Renders templates
 ├── .editorconfig
 ├── .env # Environment variables
 ├── .gitignore
-├── index.ts # Static site generator with template logic
-├── utils.ts # Shared utility functions
+├── build.ts # Static site generator
+├── index.ts # Entry template logic
 ├── README.md
 └── tsconfig.json
 
