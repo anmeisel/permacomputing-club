@@ -64,7 +64,7 @@ your-project/
 │ ├── css/
 │ │ └── style.css # Main stylesheet
 │ └── js/
-│ └── main.js # Client-side JavaScript (tags)
+│   └── main.js # Client-side JavaScript (tags)
 ├── views/ # HTML templates
 │ ├── layouts/
 │ │ └── main.html # Main layout template
@@ -72,7 +72,7 @@ your-project/
 │ │ ├── home.html # Home page template
 │ │ └── item.html # Individual item template
 │ └── partials/
-│ └── navigation.html # Navigation partial
+│   └── navigation.html # Navigation partial
 ├── utils/ # Shared utilities
 │ ├── file.ts # Directory logic
 │ └── index.ts # Markdown rendering, custom functionality
