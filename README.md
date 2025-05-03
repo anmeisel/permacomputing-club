@@ -51,6 +51,7 @@ Inspired by Elliott Cost's Website Template Styling (https://sites.elliott.compu
 
 ## Project Structure
 
+```
 your-project/
 │
 ├── .vscode/ # VS Code configuration
@@ -86,6 +87,7 @@ your-project/
 ├── index.ts # Entry template logic
 ├── README.md
 └── tsconfig.json
+```
 
 ## How It Works
 
