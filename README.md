@@ -1,4 +1,4 @@
-# London Permacomputing Club site
+# London Permacomputing Club Website
 
 A site to keep club updates, projects, notes and thoughts about permacomputing.
 
@@ -18,8 +18,9 @@ A site to keep club updates, projects, notes and thoughts about permacomputing.
 
 1. Clone this repository
 2. Create a `.env` file in the root directory with:
-   `ARENA_ACCESS_TOKEN=arena_api_token`
-   `CHANNEL_SLUG=arena_channel_slug`. Contact ana@4us4others.com for these variables.
+    - `ARENA_ACCESS_TOKEN=arena_api_token`
+    - `CHANNEL_SLUG=arena_channel_slug`
+    - Contact ana@4us4others.com for these variables
 
 ## Usage
 
