@@ -20,7 +20,7 @@ A site to keep club updates, projects, notes and thoughts about permacomputing.
 2. Create a `.env` file in the root directory with:
     - `ARENA_ACCESS_TOKEN=arena_api_token`
     - `CHANNEL_SLUG=arena_channel_slug`
-    - Contact ana@4us4others.com for these variables
+    - Contact @anmeisel for these variables
 
 ## Usage
 
@@ -32,6 +32,7 @@ A site to keep club updates, projects, notes and thoughts about permacomputing.
     - `ts-node` - TypeScript execution
     - `rimraf` - Cross-platform directory removal
     - `jsdom` - Parses HTML to measure page size
+    - `vercel` - Deployment and hosting
 2. `npm run build:preview` - Build and preview in one step
 
 ### Scripts
@@ -134,3 +135,14 @@ If you want to add any additional packages, you can:
 And for development dependencies:
 
 `npm install package-name --save-dev`
+
+## GitHub Actions, Are.na Polling & Vercel Deploy
+
+The site uses a GitHub Actions workflow to automatically check for new content on the Are.na channel every 10 minutes. This is done by polling the Are.na API using your `ARENA_ACCESS_TOKEN` and `CHANNEL_SLUG`.
+
+When a change is detected (such as a new block being added - currently there is no check for block edits), the workflow triggers a Vercel Deploy Hook via a POST request. This tells Vercel to rebuild the static site using the latest Are.na content. No need to push a Git commit for updates to appear online.
+
+Secrets like the API token and deploy hook URL are securely stored in the GitHub repository’s Actions Secrets.
+
+**Please push mindfully.**
+Our Vercel project is connected to this repository, so every time you make a push to the `main` branch, the website will redeploy. Please contact @anmeisel if you would like to be added to the Vercel project.
