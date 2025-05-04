@@ -1,5 +1,3 @@
-// arena.ts
-
 import Arena from "are.na";
 import { ArenaChannel, ArenaItem } from "../types/arena-types";
 import { generateSlug } from "../utils";

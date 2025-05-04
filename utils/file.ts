@@ -1,4 +1,3 @@
-// utils/file.ts
 import fs from "fs";
 import path from "path";
 

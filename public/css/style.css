@@ -141,6 +141,11 @@ footer {
   margin-top: 30px;
 }
 
+.size,
+.no-results-message {
+  margin: var(--padding-standard);
+}
+
 /* Mobile */
 
 @media (max-width: 768px) {

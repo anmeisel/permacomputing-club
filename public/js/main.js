@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const tag = this.textContent.trim().substring(1);
 
       // Update URL hash without page reload
-      window.location.hash = tag;
+      window.location.href = window.location.origin + "/#" + tag;
 
       // Prevent default anchor behavior
       e.preventDefault();

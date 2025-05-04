@@ -1,5 +1,3 @@
-// template.ts
-
 import fs from "fs";
 import path from "path";
 import { ArenaItem, ArenaChannel } from "../types/arena-types";

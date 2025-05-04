@@ -1,4 +1,3 @@
-// slug.ts
 import fs from "fs";
 import { ArenaChannel, ArenaItem, SlugMapping } from "../types/arena-types";
 import { generateSlug } from "../utils";
@@ -26,7 +25,6 @@ export class Slug {
         fs.unlinkSync(this.mappingFile);
         console.log(`Removed existing slug mappings file`);
       }
-      console.log(`Generating new slug mappings file...`);
 
       const mappings: SlugMapping = {};
 
@@ -61,10 +59,6 @@ export class Slug {
         this.mappingFile,
         JSON.stringify(mappings, null, 2),
         "utf8",
-      );
-
-      console.log(
-        `Saved ${Object.keys(mappings).length} slug mappings to file`,
       );
     } catch (err) {
       console.error("Error saving slug mappings:", err);

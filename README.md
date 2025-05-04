@@ -4,7 +4,7 @@ A site to keep projects, notes, thoughts and club updates about permacomputing.
 
 ## Features
 
--   Pulls content from any public or private Are.na channel (with API token)
+-   Pulls content from any public or private Are.na channel (with API token). CMS: https://www.are.na/london-permacomputing-club/permacomputing-club
 -   Simple HTML pages for each block
 -   Navigation between all blocks
     Saves slug mappings to enable efficient rebuilds
@@ -13,13 +13,14 @@ A site to keep projects, notes, thoughts and club updates about permacomputing.
 -   Supports Text, Image, and Link block types
 -   Markdown support for text content
 -   Static site generation for easy hosting and minimal resource usage
+-   Page size measuring of the static build
 
 ## Setup
 
 1. Clone this repository
 2. Create a `.env` file in the root directory with:
-   `envARENA_ACCESS_TOKEN=your_arena_token_here`
-   `CHANNEL_SLUG=your_arena_channel_slug`
+   `ARENA_ACCESS_TOKEN=arena_api_token`
+   `CHANNEL_SLUG=arena_channel_slug`. Contact ana@4us4others.com from these variables.
 
 ## Usage
 
@@ -30,6 +31,7 @@ A site to keep projects, notes, thoughts and club updates about permacomputing.
     - `marked` - Markdown parsing
     - `ts-node` - TypeScript execution
     - `rimraf` - Cross-platform directory removal
+    - `jsdom` - Parses HTML to measure page size
 2. `npm run build:preview` - Build and preview in one step
 
 ### Scripts
@@ -68,14 +70,13 @@ your-project/
 ├── views/ # HTML templates
 │ ├── layouts/
 │ │ └── main.html # Main layout template
-│ ├── pages/
-│ │ ├── home.html # Home page template
-│ │ └── item.html # Individual item template
-│ └── partials/
-│   └── navigation.html # Navigation partial
+│ └── pages/
+│   ├──home.html # Home page template
+│   └── item.html # Individual item template
 ├── utils/ # Shared utilities
 │ ├── file.ts # Directory logic
-│ └── index.ts # Markdown rendering, custom functionality
+│ ├── index.ts # Markdown rendering, custom functionality
+│ └── size.ts # Page size measuring
 ├── scripts/ # Server-side scripts
 │ ├── arena.ts # Fetches are.na content
 │ ├── slug.ts # Maps slugs
@@ -94,14 +95,16 @@ your-project/
 ### Template System:
 
 Uses a simple custom template engine with variable substitution
+
 Supports partials with `{{> partial_name}}` syntax
+
 Variables use `{{ variable_name }}` syntax
 
 ### File Organisation:
 
 `layouts`: Contains the main page structure (header, footer)
+
 `pages`: Contains the specific content for each page type
-`partials`: Contains reusable components like navigation
 
 ### Styling:
 
@@ -110,26 +113,33 @@ Additional stylesheets can be added and linked as needed
 
 ### Client-side JavaScript:
 
-Separate JS file for any browser functionality
-Loaded at the bottom of the page for better performance
+Separate JS files are in the `public/js` directory for any browser functionality
 
 ### Content Rendering:
 
 Text content is rendered as Markdown for rich formatting
+
 Link descriptions also support Markdown formatting
+
 Images and other content types are rendered appropriately
+
+Please check `scripts/template.ts` to see how are.na content is rendered into the `views` templates
 
 ## Customisation
 
 You can easily modify:
 
-The HTML structure by editing template files
-The styling by editing CSS files
-Add interactive features by updating the JavaScript file
+-   The HTML structure by editing template files
+-   The styling by editing CSS files
+-   Add interactive features by updating the JavaScript file
+-   Please discuss any proposed improvements or additions that go beyond basic styling or client-side functionality with the rest of the group before proceeding
 
 ### Adding packages
 
 If you want to add any additional packages, you can:
+
 `npm install package-name --save`
+
 And for development dependencies:
+
 `npm install package-name --save-dev`

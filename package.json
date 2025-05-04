@@ -4,7 +4,7 @@
   "description": "A simple website built from Are.na channel content",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf build slug-mappings.json && ts-node index.ts",
+    "build": "rimraf build slug-mappings.json && ts-node index.ts && ts-node utils/size.ts ./build",
     "preview": "serve build",
     "build:preview": "npm run build && npm run preview",
     "clean": "rimraf build dist slug-mappings.json node_modules/.cache"
@@ -23,7 +23,9 @@
     "marked": "^9.1.0"
   },
   "devDependencies": {
+    "@types/jsdom": "^21.1.7",
     "@types/marked": "^5.0.1",
+    "jsdom": "^26.1.0",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"

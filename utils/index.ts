@@ -1,8 +1,6 @@
-// utils/index.ts
 import { ArenaItem } from "../types/arena-types";
-import { marked } from "marked"; // Import marked for markdown processing
+import { marked } from "marked";
 
-// Re-export utility functions
 export * from "./file";
 
 /**
@@ -289,8 +287,6 @@ export function processItemDescription(description: string): {
           `<div class="description-field author-field"><span class="description-key">Author:</span> <a href="/${encodeURIComponent(value)}">${value}</a></div>`,
         );
       }
-      // Note: Removed the "else" case that handled other description fields
-      // since we're now only matching specific fields
     } else {
       // If it doesn't match a description format, add to markdown content
       // Add double newline after each line to ensure proper markdown spacing

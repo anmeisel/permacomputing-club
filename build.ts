@@ -1,10 +1,9 @@
-// build.ts
-
 import path from "path";
 import fs from "fs";
 import { ArenaChannel, ArenaItem } from "./types/arena-types";
 import { renderHomePage, renderItemPage } from "./scripts/template";
 import { copyDirectory } from "./utils/file";
+import { measurePageSize } from "./utils/size";
 
 // Constants
 const BUILD_DIR = path.resolve(process.cwd(), "build");
@@ -19,9 +18,7 @@ export function prepareBuildDirectory(): void {
       fs.mkdirSync(BUILD_DIR, { recursive: true });
 
       // Verify directory was created
-      if (fs.existsSync(BUILD_DIR)) {
-        console.log(`Build directory created at: ${BUILD_DIR}`);
-      } else {
+      if (!fs.existsSync(BUILD_DIR)) {
         console.error(
           `Failed to create build directory even though no error was thrown`,
         );
@@ -43,7 +40,6 @@ export function prepareBuildDirectory(): void {
         }
       }
     });
-    console.log(`Cleared existing build directory content`);
   }
 
   // Create public directories in build
@@ -58,7 +54,6 @@ export function prepareBuildDirectory(): void {
 export function copyStaticAssets(srcDir: string): void {
   // Copy static assets to the build root
   copyDirectory(path.join(srcDir, "public"), BUILD_DIR);
-  console.log("Static assets copied to build directory");
 }
 
 /**
@@ -73,10 +68,13 @@ export function generateHomePage(
   templatesDir: string,
 ): void {
   const homeHtml = renderHomePage(channelData, slugMap, templatesDir);
+  const homeFilePath = path.join(BUILD_DIR, "index.html");
 
   // Write home page to build directory
-  fs.writeFileSync(path.join(BUILD_DIR, "index.html"), homeHtml);
-  console.log("Home page generated successfully");
+  fs.writeFileSync(homeFilePath, homeHtml);
+
+  // Measure and update page size
+  measurePageSize(homeFilePath);
 }
 
 /**
@@ -102,11 +100,14 @@ export async function generateItemPages(
       templatesDir,
     );
 
-    // Write item page to build directory
-    fs.writeFileSync(path.join(itemDirectory, "index.html"), itemHtml);
-  }
+    const itemFilePath = path.join(itemDirectory, "index.html");
 
-  console.log(`Generated ${slugMap.size} item pages`);
+    // Write item page to build directory
+    fs.writeFileSync(itemFilePath, itemHtml);
+
+    // Measure and update page size
+    measurePageSize(itemFilePath);
+  }
 }
 
 /**
