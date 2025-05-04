@@ -1,10 +1,8 @@
 const fetch = require("node-fetch");
-const fs = require("fs");
 
 const token = process.env.ARENA_ACCESS_TOKEN;
 const channel = process.env.CHANNEL_SLUG;
 const webhook = process.env.VERCEL_DEPLOY_HOOK_URL;
-const stateFile = ".arena_state.json";
 
 async function getBlockCount() {
   const res = await fetch(`https://api.are.na/v2/channels/${channel}`, {
@@ -14,24 +12,28 @@ async function getBlockCount() {
   return data.contents.length;
 }
 
+async function getLastKnownCount() {
+  try {
+    // Get the count from a file in your repo or use GitHub API to check previous run
+    // For simplicity, we'll always trigger a deploy for now
+    return 0;
+  } catch (e) {
+    return 0;
+  }
+}
+
 async function triggerDeploy() {
   console.log("Triggering Vercel deploy...");
-  await fetch(webhook, { method: "POST" });
+  // Add forceNew=true parameter to ensure Vercel rebuilds everything
+  await fetch(`${webhook}&forceNew=true`, { method: "POST" });
 }
 
 (async () => {
+  console.log("Checking Arena for changes...");
   const newCount = await getBlockCount();
-  let oldCount = 0;
+  console.log(`Current block count: ${newCount}`);
 
-  if (fs.existsSync(stateFile)) {
-    oldCount = JSON.parse(fs.readFileSync(stateFile)).count;
-  }
-
-  if (newCount !== oldCount) {
-    console.log(`Change detected (${oldCount} → ${newCount})`);
-    await triggerDeploy();
-    fs.writeFileSync(stateFile, JSON.stringify({ count: newCount }));
-  } else {
-    console.log("No changes detected.");
-  }
+  // Always trigger deploy for testing
+  await triggerDeploy();
+  console.log("Deploy triggered successfully");
 })();
