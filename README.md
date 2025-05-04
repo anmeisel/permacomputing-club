@@ -91,12 +91,15 @@ permacomputing-club/
 
 ## How It Works
 
-### Template System:
+### Template System & Content Rendering:
 
-Uses a simple custom templating function called `renderTemplate` (`scripts/template.ts`) with variable substitution.
+Uses a simple custom templating function called `renderTemplate` (`scripts/template.ts`) with variable substitution. Here we render content into the `views` templates.
 
 -   Supports partials with `{{> partial_name}}` syntax
 -   Variables use `{{ variable_name }}` syntax
+-   Text content is rendered as Markdown for rich formatting
+-   Link descriptions also support Markdown formatting
+-   Images and other content types are rendered appropriately
 
 ### File Organisation:
 
@@ -106,19 +109,11 @@ Uses a simple custom templating function called `renderTemplate` (`scripts/templ
 
 ### Styling:
 
-CSS is completely separate in the `public/css` directory
-Additional stylesheets can be added and linked as needed
+CSS is completely separate in the `public/css` directory. Additional stylesheets can be added and linked as needed.
 
 ### Client-side JavaScript:
 
-Separate JS files are in the `public/js` directory for any browser functionality
-
-### Content Rendering:
-
-Text content is rendered as Markdown for rich formatting
-Link descriptions also support Markdown formatting
-Images and other content types are rendered appropriately
-Please check `scripts/template.ts` to see how are.na content is rendered into the `views` templates
+Separate JS files are in the `public/js` directory for any browser functionality.
 
 ## Customisation
 
