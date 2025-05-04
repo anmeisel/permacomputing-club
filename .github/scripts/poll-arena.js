@@ -8,24 +8,22 @@ async function getBlockCount() {
   const res = await fetch(`https://api.are.na/v2/channels/${channel}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
   const data = await res.json();
   return data.contents.length;
 }
 
-async function getLastKnownCount() {
-  try {
-    // Get the count from a file in your repo or use GitHub API to check previous run
-    // For simplicity, we'll always trigger a deploy for now
-    return 0;
-  } catch (e) {
-    return 0;
-  }
-}
-
 async function triggerDeploy() {
   console.log("Triggering Vercel deploy...");
-  // Add forceNew=true parameter to ensure Vercel rebuilds everything
-  await fetch(`${webhook}&forceNew=true`, { method: "POST" });
+  const res = await fetch(`${webhook}&forceNew=true`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+  const text = await res.text();
+  console.log("Deploy response:", res.status, text);
 }
 
 (async () => {
