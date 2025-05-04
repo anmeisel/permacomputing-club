@@ -1,13 +1,12 @@
 # London Permacomputing Club site
 
-A site to keep projects, notes, thoughts and club updates about permacomputing.
+A site to keep club updates, projects, notes and thoughts about permacomputing.
 
 ## Features
 
--   Pulls content from any public or private Are.na channel (with API token). CMS: https://www.are.na/london-permacomputing-club/permacomputing-club
+-   Pulls content from closed Are.na channel via API token. CMS: https://www.are.na/london-permacomputing-club/permacomputing-club
 -   Simple HTML pages for each block
--   Navigation between all blocks
-    Saves slug mappings to enable efficient rebuilds
+-   Saves slug mappings to enable efficient rebuilds
 -   Homepage displaying all posts in reverse chronological order
 -   Tags for creating connections between posts
 -   Supports Text, Image, and Link block types
@@ -20,7 +19,7 @@ A site to keep projects, notes, thoughts and club updates about permacomputing.
 1. Clone this repository
 2. Create a `.env` file in the root directory with:
    `ARENA_ACCESS_TOKEN=arena_api_token`
-   `CHANNEL_SLUG=arena_channel_slug`. Contact ana@4us4others.com from these variables.
+   `CHANNEL_SLUG=arena_channel_slug`. Contact ana@4us4others.com for these variables.
 
 ## Usage
 
@@ -54,7 +53,7 @@ Inspired by Elliott Cost's Website Template Styling (https://sites.elliott.compu
 ## Project Structure
 
 ```
-your-project/
+permacomputing-club/
 │
 ├── .vscode/ # VS Code configuration
 ├── build/ # Static HTML from build script
@@ -94,11 +93,10 @@ your-project/
 
 ### Template System:
 
-Uses a simple custom template engine with variable substitution
+Uses a simple custom templating function called `renderTemplate` (`scripts/template.ts`) with variable substitution.
 
-Supports partials with `{{> partial_name}}` syntax
-
-Variables use `{{ variable_name }}` syntax
+-   Supports partials with `{{> partial_name}}` syntax
+-   Variables use `{{ variable_name }}` syntax
 
 ### File Organisation:
 
@@ -118,11 +116,8 @@ Separate JS files are in the `public/js` directory for any browser functionality
 ### Content Rendering:
 
 Text content is rendered as Markdown for rich formatting
-
 Link descriptions also support Markdown formatting
-
 Images and other content types are rendered appropriately
-
 Please check `scripts/template.ts` to see how are.na content is rendered into the `views` templates
 
 ## Customisation
