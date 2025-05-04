@@ -19,6 +19,25 @@ export function generateSlug(str: string): string {
 }
 
 /**
+ * Add target="_blank" to all external links
+ * @param html HTML content to process
+ * @returns HTML with target="_blank" added to external links
+ */
+export function addTargetBlankToExternalLinks(html: string): string {
+  // Regular expression to find external links (those that start with http:// or https://)
+  // This regex finds <a> tags with href attributes starting with http:// or https://
+  // and doesn't already have a target attribute
+  const externalLinkRegex =
+    /<a\s+(?![^>]*target=)[^>]*href=["']https?:\/\/[^"']+["'][^>]*>/gi;
+
+  // Replace all matches with the same tag plus target="_blank" attribute
+  return html.replace(externalLinkRegex, (match) => {
+    // Insert target="_blank" before the closing > of the <a> tag
+    return match.replace(/>$/, ' target="_blank" rel="noopener noreferrer">');
+  });
+}
+
+/**
  * Extracts colour value from item description
  * @param description The raw description text to process
  * @returns Colour value as string or empty string if not found
@@ -73,12 +92,16 @@ export function extractColourFromDescription(description: string): {
  */
 export async function processItemContent(item: ArenaItem): Promise<string> {
   try {
+    let html = "";
+
     switch (item.class) {
       case "Image":
         if (item.image && item.image.display && item.image.display.url) {
-          return `<img src="${item.image.display.url}" alt="${item.title || "Arena image"}" class="item-image" />`;
+          html = `<img src="${item.image.display.url}" alt="${item.title || "Arena image"}" class="item-image" />`;
+        } else {
+          html = `<div class="error">Image URL not available</div>`;
         }
-        return `<div class="error">Image URL not available</div>`;
+        break;
 
       case "Text":
         // Parse the content as markdown if it's a text block
@@ -134,7 +157,7 @@ export async function processItemContent(item: ArenaItem): Promise<string> {
               })
               .join("\n");
 
-            return `<div class="structured-content">${renderedBlocks}</div>`;
+            html = `<div class="structured-content">${renderedBlocks}</div>`;
           } catch (err) {
             console.error(
               `Error parsing JSON content for item ${item.id}:`,
@@ -145,7 +168,7 @@ export async function processItemContent(item: ArenaItem): Promise<string> {
         }
 
         // Standard markdown processing for non-JSON content
-        if (typeof processedContent === "string") {
+        if (!html && typeof processedContent === "string") {
           try {
             // Handle headlines before markdown parsing
             processedContent = processedContent
@@ -163,55 +186,65 @@ export async function processItemContent(item: ArenaItem): Promise<string> {
 
             // Convert markdown to HTML
             processedContent = marked.parse(processedContent);
+            html = `<div class="text-content">${processedContent}</div>`;
           } catch (err) {
             console.error(`Error parsing markdown for item ${item.id}:`, err);
             // Fall back to plain text if markdown parsing fails
+            html = `<div class="text-content">${processedContent}</div>`;
           }
         }
-
-        return `<div class="text-content">${processedContent}</div>`;
+        break;
 
       case "Link":
-        return `
+        html = `
           <div class="link-content">
-            <h3><a href="${item.source?.url || "#"}" target="_blank">${item.title || item.source?.url || "Untitled Link"}</a></h3>
+            <h3><a href="${item.source?.url || "#"}" target="_blank" rel="noopener noreferrer">${item.title || item.source?.url || "Untitled Link"}</a></h3>
             ${item.description ? `<p class="description">${item.description}</p>` : ""}
             ${item.image ? `<img src="${item.image.display?.url}" alt="${item.title || "Link preview"}" />` : ""}
           </div>
         `;
+        break;
 
       case "Attachment":
         if (item.attachment && item.attachment.url) {
-          return `
+          html = `
             <div class="attachment-content">
               <h3>${item.title || "Attachment"}</h3>
               <a href="${item.attachment.url}" class="download-link" download>Download Attachment</a>
             </div>
           `;
+        } else {
+          html = `<div class="error">Attachment not available</div>`;
         }
-        return `<div class="error">Attachment not available</div>`;
+        break;
 
       case "Media":
         // Handle embedded media (like YouTube videos)
         if (item.embed && item.embed.html) {
-          return `
+          html = `
             <div class="media-embed">
               ${item.embed.html}
             </div>
           `;
+        } else {
+          html = `<div class="error">Media embed not available</div>`;
         }
-        return `<div class="error">Media embed not available</div>`;
+        break;
 
       default:
         // Default case for unknown types
-        return `
+        html = `
           <div class="generic-content">
             ${item.title ? `<h3>${item.title}</h3>` : ""}
             ${item.content ? `<div class="content">${item.content}</div>` : ""}
             ${item.description ? `<div class="description">${item.description}</div>` : ""}
           </div>
         `;
+        break;
     }
+
+    // Apply target="_blank" to all external links before returning the content
+    return addTargetBlankToExternalLinks(html);
   } catch (err) {
     console.error(`Error processing content for item ${item.id}:`, err);
     return `<div class="error">Error processing content: ${err instanceof Error ? err.message : "Unknown error"}</div>`;
@@ -312,8 +345,9 @@ export function processItemDescription(description: string): {
     .filter((content) => content !== "")
     .join("\n");
 
+  // Apply target="_blank" to all external links
   return {
-    html: result,
+    html: addTargetBlankToExternalLinks(result),
     isPinned,
   };
 }

@@ -1,14 +1,14 @@
 {
-  "pink-sky": {
-    "id": 36307363,
-    "title": "Pink sky",
-    "class": "Text",
-    "original_title": "Pink sky"
-  },
   "about": {
     "id": 36427154,
     "title": "About",
     "class": "Text",
     "original_title": "About"
+  },
+  "propagation": {
+    "id": 36442648,
+    "title": "Propagation",
+    "class": "Text",
+    "original_title": "Propagation"
   }
 }
