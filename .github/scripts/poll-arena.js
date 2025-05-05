@@ -23,75 +23,31 @@ async function getBlockCount() {
 
 async function checkDeployStatus(jobId) {
   console.log(`Checking status of job ${jobId}...`);
-  // Try both v1 and v6 API endpoints to see which works
-  const responses = await Promise.all([
-    fetch(`https://api.vercel.com/v1/deployments/${jobId}`, {
-      headers: { Authorization: `Bearer ${vercelToken}` },
-    }),
-    fetch(`https://api.vercel.com/v6/deployments/${jobId}`, {
-      headers: { Authorization: `Bearer ${vercelToken}` },
-    }),
-  ]);
-
-  // Process both responses
-  for (let i = 0; i < responses.length; i++) {
-    const res = responses[i];
-    const version = i === 0 ? "v1" : "v6";
-
-    console.log(`${version} API status code: ${res.status}`);
-    if (res.status === 200) {
-      const text = await res.text();
-      try {
-        const data = JSON.parse(text);
-        console.log(
-          `${version} deployment info:`,
-          JSON.stringify(data, null, 2).substring(0, 500) + "...",
-        );
-        return data;
-      } catch (e) {
-        console.log(`Could not parse ${version} response as JSON:`, e.message);
-      }
-    } else {
-      const text = await res.text();
-      console.log(`${version} error response:`, text);
-    }
-  }
-
-  // If we're not getting good data from the deployment endpoints,
-  // let's try checking all deployments to see if this job appears
-  console.log("Checking all deployments...");
+  console.log("Checking recent deployments...");
   const listRes = await fetch(`https://api.vercel.com/v6/deployments`, {
     headers: { Authorization: `Bearer ${vercelToken}` },
   });
 
   if (listRes.status === 200) {
-    const text = await listRes.text();
-    try {
-      const data = JSON.parse(text);
+    const data = await listRes.json();
+    console.log(
+      `Found ${data.deployments ? data.deployments.length : 0} deployments`,
+    );
+    if (data.deployments && data.deployments.length > 0) {
+      const latestDeploy = data.deployments[0];
+      console.log(`Latest deployment state: ${latestDeploy.state}`);
       console.log(
-        `Found ${data.deployments ? data.deployments.length : 0} deployments`,
+        `Latest deployment created: ${new Date(latestDeploy.created).toISOString()}`,
       );
-      if (data.deployments && data.deployments.length > 0) {
-        // Just log the first deployment to see structure
-        console.log(
-          "Latest deployment:",
-          JSON.stringify(data.deployments[0], null, 2).substring(0, 500) +
-            "...",
-        );
-      }
-    } catch (e) {
-      console.log("Could not parse deployments list as JSON");
     }
   } else {
-    const text = await listRes.text();
-    console.log("List deployments error:", text);
+    console.log(`List deployments error: ${listRes.status}`);
   }
 
   return null;
 }
 
 async function triggerDeploy() {
-  console.log(`Using webhook URL: ${webhook.substring(0, 30)}...`); // Partial URL for security
   console.log("Triggering Vercel deploy...");
   const res = await fetch(webhook, {
     method: "POST",
@@ -100,15 +56,13 @@ async function triggerDeploy() {
     },
     body: JSON.stringify({}),
   });
-  const data = await res.text();
-  console.log(`Deploy response: ${res.status} ${data}`);
 
-  try {
-    const jsonData = JSON.parse(data);
-    console.log("Deploy job ID:", jsonData.job.id);
-    return jsonData; // Return the parsed data
-  } catch (e) {
-    console.log("Could not parse response as JSON");
+  if (res.status === 201) {
+    const jsonData = await res.json();
+    console.log("Deploy job triggered successfully");
+    return jsonData;
+  } else {
+    console.log(`Deploy trigger failed with status: ${res.status}`);
     return null;
   }
 }
@@ -118,12 +72,12 @@ async function triggerDeploy() {
   const newCount = await getBlockCount();
   console.log(`Current block count: ${newCount}`);
 
-  // Always trigger deploy for testing
-  const jsonData = await triggerDeploy(); // Store the returned data
+  // Trigger deploy
+  const jsonData = await triggerDeploy();
   if (jsonData && jsonData.job && jsonData.job.id) {
     await checkDeployStatus(jsonData.job.id);
   } else {
     console.log("No valid job ID received from deploy trigger");
   }
-  console.log("Deploy triggered successfully");
+  console.log("Deploy process completed");
 })();
