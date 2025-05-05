@@ -23,15 +23,71 @@ async function getBlockCount() {
 
 async function checkDeployStatus(jobId) {
   console.log(`Checking status of job ${jobId}...`);
-  const res = await fetch(`https://api.vercel.com/v1/deployments/${jobId}`, {
-    headers: {
-      Authorization: `Bearer ${vercelToken}`,
-    },
+  // Try both v1 and v6 API endpoints to see which works
+  const responses = await Promise.all([
+    fetch(`https://api.vercel.com/v1/deployments/${jobId}`, {
+      headers: { Authorization: `Bearer ${vercelToken}` },
+    }),
+    fetch(`https://api.vercel.com/v6/deployments/${jobId}`, {
+      headers: { Authorization: `Bearer ${vercelToken}` },
+    }),
+  ]);
+
+  // Process both responses
+  for (let i = 0; i < responses.length; i++) {
+    const res = responses[i];
+    const version = i === 0 ? "v1" : "v6";
+
+    console.log(`${version} API status code: ${res.status}`);
+    if (res.status === 200) {
+      const text = await res.text();
+      try {
+        const data = JSON.parse(text);
+        console.log(
+          `${version} deployment info:`,
+          JSON.stringify(data, null, 2).substring(0, 500) + "...",
+        );
+        return data;
+      } catch (e) {
+        console.log(`Could not parse ${version} response as JSON:`, e.message);
+      }
+    } else {
+      const text = await res.text();
+      console.log(`${version} error response:`, text);
+    }
+  }
+
+  // If we're not getting good data from the deployment endpoints,
+  // let's try checking all deployments to see if this job appears
+  console.log("Checking all deployments...");
+  const listRes = await fetch(`https://api.vercel.com/v6/deployments`, {
+    headers: { Authorization: `Bearer ${vercelToken}` },
   });
-  const data = await res.json();
-  console.log(`Deployment status: ${data.state}`);
-  console.log(`Project ID: ${data.projectId}`);
-  return data;
+
+  if (listRes.status === 200) {
+    const text = await listRes.text();
+    try {
+      const data = JSON.parse(text);
+      console.log(
+        `Found ${data.deployments ? data.deployments.length : 0} deployments`,
+      );
+      if (data.deployments && data.deployments.length > 0) {
+        // Just log the first deployment to see structure
+        console.log(
+          "Latest deployment:",
+          JSON.stringify(data.deployments[0], null, 2).substring(0, 500) +
+            "...",
+        );
+      }
+    } catch (e) {
+      console.log("Could not parse deployments list as JSON");
+    }
+  } else {
+    const text = await listRes.text();
+    console.log("List deployments error:", text);
+  }
+
+  return null;
 }
 
 async function triggerDeploy() {
