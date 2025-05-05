@@ -162,15 +162,15 @@ This roadmap is a living document meant to evolve with our collective knowledge 
 -   Migrate to self-hosted local server infrastructure to reduce dependency on cloud services
 -   Implement low-power computing strategies. For example, Vercel triggers a deploy per repo push, which is not ecological
 -   Explore offline-first functionality using Service Workers
+-   Investigate peer-to-peer content sharing
 
 ### Content Management
 
--   Enhance `.github/scripts/poll-arena.js` to detect changes in block content, not just block count
--   Transition from Are.na to decentralized content networks:
--   Integrate with ActivityPub/Fediverse (Mastodon API) for federated content sharing
--   Explore distributed content storage
--   Consider implementing a simple git-based CMS for version control and offline editing
--   Investigate peer-to-peer content sharing
+1. Enhance `.github/scripts/poll-arena.js` to detect changes in block content, not just block count
+2. Transition from Are.na to decentralized content networks:
+    - Integrate with ActivityPub/Fediverse (Mastodon API) for federated content sharing
+    - Explore distributed content storage
+    - Consider implementing a simple git-based CMS for version control and offline editing
 
 ### Media Handling
 
@@ -180,15 +180,15 @@ This roadmap is a living document meant to evolve with our collective knowledge 
 
 ### Performance & Accessibility
 
--   Double check `utils/size.ts` to ensure accurate page size measurement
--   Implement comprehensive accessibility testing:
--   Manual keyboard navigation testing
--   Screen reader compatibility verification
--   Color contrast analysis (WCAG 2.1 Level AA Standards)
--   Add a "low-bandwidth mode" toggle that loads text-only version
+1. Double check `utils/size.ts` to ensure accurate page size measurement
+2. Implement accessibility testing:
+    - Manual keyboard navigation testing
+    - Screen reader compatibility verification
+    - Color contrast analysis (WCAG 2.1 Level AA Standards)
+3. Add a "low-bandwidth mode" toggle that loads text-only version
 
 ### Documentation & Community
 
--   Document the carbon footprint of the website
+-   Document the carbon footprint of the website and accessibility audits
 -   Create community contribution guidelines
 -   Develop a template version others can easily fork and customise
