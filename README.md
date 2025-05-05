@@ -50,13 +50,14 @@ A site to keep club updates, projects, notes and thoughts about permacomputing.
 
 ## Credits
 
-Inspired by Elliott Cost's Website Template Styling (https://sites.elliott.computer/html-templates): Memory site was inspired by Piper Haywood (https://piperhaywood.com) and Zinzy Waleson Geene (https://www.zinzy.website) websites.
+Inspired by Elliott Cost's Website Template Styling (https://sites.elliott.computer/html-templates): Memory site was inspired by [Piper Haywood](https://piperhaywood.com) and [Zinzy Waleson Geene](https://www.zinzy.website) websites.
 
 ## Project Structure
 
 ```
 permacomputing-club/
 │
+├── .github/ # GitHub Actions scripts + workflows
 ├── .vscode/ # VS Code configuration
 ├── build/ # Static HTML from build script
 ├── types/ # TypeScript type definitions
@@ -146,3 +147,48 @@ Secrets like the API token and deploy hook URL are securely stored in the GitHub
 
 **Please push mindfully.**
 Our Vercel project is connected to this repository, so every time you make a push to the `main` branch, the website will redeploy. Please contact @anmeisel if you would like to be added to the Vercel project.
+
+## Future Improvements
+
+This roadmap is a living document meant to evolve with our collective knowledge and priorities. If you have ideas that match [permacomputing principles](https://permacomputing.net/Principles/) or technical improvements to suggest, please:
+
+-   Share your thoughts during club meetings
+-   Submit proposals via pull requests
+-   Add notes to the following points in this README
+-   Experiment with implementations and share your findings
+
+### Infrastructure & Hosting
+
+-   Migrate to self-hosted local server infrastructure to reduce dependency on cloud services
+-   Implement low-power computing strategies. For example, Vercel triggers a deploy per repo push, which is not ecological
+-   Explore offline-first functionality using Service Workers
+
+### Content Management
+
+-   Enhance `.github/scripts/poll-arena.js` to detect changes in block content, not just block count
+-   Transition from Are.na to decentralized content networks:
+-   Integrate with ActivityPub/Fediverse (Mastodon API) for federated content sharing
+-   Explore distributed content storage
+-   Consider implementing a simple git-based CMS for version control and offline editing
+-   Investigate peer-to-peer content sharing
+
+### Media Handling
+
+-   Create a script that automatically dithers all images to reduce file size and energy consumption
+-   Implement responsive image loading with multiple resolutions based on device capabilities
+-   Add WebP/AVIF conversion with fallbacks for broader compatibility
+
+### Performance & Accessibility
+
+-   Double check `utils/size.ts` to ensure accurate page size measurement
+-   Implement comprehensive accessibility testing:
+-   Manual keyboard navigation testing
+-   Screen reader compatibility verification
+-   Color contrast analysis (WCAG 2.1 Level AA Standards)
+-   Add a "low-bandwidth mode" toggle that loads text-only version
+
+### Documentation & Community
+
+-   Document the carbon footprint of the website
+-   Create community contribution guidelines
+-   Develop a template version others can easily fork and customise
