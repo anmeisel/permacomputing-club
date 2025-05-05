@@ -22,8 +22,14 @@ async function triggerDeploy() {
     },
     body: JSON.stringify({}),
   });
-  const text = await res.text();
-  console.log(`Deploy response: ${res.status} ${text}`);
+  const data = await res.text();
+  console.log(`Deploy response: ${res.status} ${data}`);
+  try {
+    const jsonData = JSON.parse(data);
+    console.log("Deploy job ID:", jsonData.job.id);
+  } catch (e) {
+    console.log("Could not parse response as JSON");
+  }
 }
 
 (async () => {
