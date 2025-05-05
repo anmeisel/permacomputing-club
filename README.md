@@ -50,7 +50,7 @@ A site to keep club updates, projects, notes and thoughts about permacomputing.
 
 ## Credits
 
-Inspired by Elliott Cost's Website Template Styling (https://sites.elliott.computer/html-templates): Memory site was inspired by [Piper Haywood](https://piperhaywood.com) and [Zinzy Waleson Geene](https://www.zinzy.website) websites.
+Some styling was used from [Elliott Cost's Memory Site](https://sites.elliott.computer/html-templates) which was inspired by [Piper Haywood](https://piperhaywood.com) and [Zinzy Waleson Geene](https://www.zinzy.website) websites.
 
 ## Project Structure
 
@@ -167,7 +167,7 @@ This roadmap is a living document meant to evolve with our collective knowledge 
 ### Content Management
 
 1. Enhance `.github/scripts/poll-arena.js` to detect changes in block content, not just block count
-2. Transition from Are.na to decentralized content networks:
+2. Transition from Are.na to decentralised content networks:
     - Integrate with ActivityPub/Fediverse (Mastodon API) for federated content sharing
     - Explore distributed content storage
     - Consider implementing a simple git-based CMS for version control and offline editing
