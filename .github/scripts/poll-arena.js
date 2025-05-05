@@ -15,7 +15,7 @@ async function getBlockCount() {
 
 async function triggerDeploy() {
   console.log("Triggering Vercel deploy...");
-  const res = await fetch(`${webhook}&forceNew=true`, {
+  const res = await fetch(webhook, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -23,7 +23,7 @@ async function triggerDeploy() {
     body: JSON.stringify({}),
   });
   const text = await res.text();
-  console.log("Deploy response:", res.status, text);
+  console.log(`Deploy response: ${res.status} ${text}`);
 }
 
 (async () => {
