@@ -83,4 +83,16 @@ export class Slug {
       return null;
     }
   }
+
+  /**
+   * Checks if a slug exists in the mappings
+   * @param slug The slug to check
+   * @returns True if slug exists, false otherwise
+   */
+  slugExists(slug: string): boolean {
+    const mappings = this.loadSlugMappings();
+    if (!mappings) return false;
+
+    return Object.prototype.hasOwnProperty.call(mappings, slug);
+  }
 }

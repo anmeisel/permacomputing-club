@@ -73,8 +73,9 @@ permacomputing-club/
 │ ├── layouts/
 │ │ └── main.html # Main layout template
 │ └── pages/
-│   ├──home.html # Home page template
-│   └── item.html # Individual item template
+│   ├── home.html # Home page template
+│   ├── item.html # Individual item template
+│   └── 404.html # 404 page template
 ├── utils/ # Shared utilities
 │ ├── file.ts # Directory logic
 │ ├── index.ts # Markdown rendering, custom functionality

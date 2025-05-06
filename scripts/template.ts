@@ -245,3 +245,29 @@ export async function renderItemPage(
     content: pageContent,
   });
 }
+
+/**
+ * Renders the 404 page
+ * @param channelData Channel data from Arena
+ * @param slugMap Map of slugs to ArenaItems
+ * @param templatesDir Directory containing templates
+ * @returns Rendered HTML for 404 page
+ */
+export function render404Page(
+  channelData: ArenaChannel,
+  slugMap: Map<string, ArenaItem>,
+  templatesDir: string,
+): string {
+  // Read the 404 page content
+  const pageContent = fs.readFileSync(
+    path.join(templatesDir, "pages/404.html"),
+    "utf8",
+  );
+
+  return renderTemplate(path.join(templatesDir, "layouts/main.html"), {
+    title: `${channelData.title} | Page not found`,
+    channelTitle: channelData.title,
+    navLinks: getNavigationLinks(slugMap),
+    content: pageContent,
+  });
+}

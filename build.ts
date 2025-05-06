@@ -1,7 +1,11 @@
 import path from "path";
 import fs from "fs";
 import { ArenaChannel, ArenaItem } from "./types/arena-types";
-import { renderHomePage, renderItemPage } from "./scripts/template";
+import {
+  renderHomePage,
+  renderItemPage,
+  render404Page,
+} from "./scripts/template";
 import { copyDirectory } from "./utils/file";
 import { measurePageSize } from "./utils/size";
 
@@ -111,6 +115,27 @@ export async function generateItemPages(
 }
 
 /**
+ * Generates the 404 page and writes it to the build directory
+ * @param channelData Channel data from Arena
+ * @param slugMap Map of slugs to ArenaItems
+ * @param templatesDir Directory containing templates
+ */
+export function generate404Page(
+  channelData: ArenaChannel,
+  slugMap: Map<string, ArenaItem>,
+  templatesDir: string,
+): void {
+  const notFoundHtml = render404Page(channelData, slugMap, templatesDir);
+  const notFoundFilePath = path.join(BUILD_DIR, "404.html");
+
+  // Write 404 page to build directory
+  fs.writeFileSync(notFoundFilePath, notFoundHtml);
+
+  // Measure and update page size
+  measurePageSize(notFoundFilePath);
+}
+
+/**
  * Main function to generate all static pages
  * @param channelData Channel data from Arena
  * @param slugMap Map of slugs to ArenaItems
@@ -141,6 +166,9 @@ export async function generateStaticPages(
 
     // Generate item pages - Pass channelData here
     await generateItemPages(slugMap, templatesDir, channelData);
+
+    // Generate 404 page
+    generate404Page(channelData, slugMap, templatesDir);
 
     console.log(`Page generation completed at: ${new Date().toISOString()}`);
   } catch (err) {
