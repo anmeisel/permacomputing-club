@@ -159,7 +159,7 @@ This roadmap is a living document meant to evolve with our collective knowledge 
 
 ### Infrastructure & Hosting
 
--   Migrate to self-hosted local server infrastructure to reduce dependency on cloud services
+-   Migrate to self-hosted local server infrastructure to reduce dependency on cloud services (@pelinski is currently working on this!)
 -   Implement low-power computing strategies. For example, Vercel triggers a deploy per repo push, which is not ecological
 -   Explore offline-first functionality using Service Workers
 -   Investigate peer-to-peer content sharing
