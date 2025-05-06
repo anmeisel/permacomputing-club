@@ -6,6 +6,7 @@ import {
   processItemContent,
   processItemDescription,
   extractColourFromDescription,
+  formatDate,
 } from "../utils";
 
 /**
@@ -128,6 +129,10 @@ export function renderHomePage(
     const blockHtml = `<div class="content-block${isPinned ? " pinned" : ""}" data-id="${item.id}"${styleAttribute}>
       <h2><a href="/${slug}">${displayTitle}</a></h2>
       ${itemDescription ? `<div class="item-description">${itemDescription}</div>` : ""}
+      <div class="item-timestamps">
+        <span class="timestamp created">Created: ${formatDate(item.created_at)}</span>
+        <span class="timestamp updated">Updated: ${formatDate(item.updated_at)}</span>
+      </div>
     </div>`;
 
     return {
@@ -233,8 +238,10 @@ export async function renderItemPage(
       itemContent: itemContent,
       itemDescription: itemDescription,
       itemId: item.id.toString(),
-      styleAttribute: styleAttribute, // Pass the style attribute to the template
-      isPinned: isPinned ? "true" : "false", // Pass isPinned as a string
+      styleAttribute: styleAttribute,
+      isPinned: isPinned ? "true" : "false",
+      createdAt: formatDate(item.created_at),
+      updatedAt: formatDate(item.updated_at),
     },
   );
 

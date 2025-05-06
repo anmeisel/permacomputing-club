@@ -3,6 +3,7 @@
   --font-size: 20px;
   --line-height: 1.5;
   --color-text: #3f3f3f;
+  --color-lighter: #666;
   --color-background: #ffffff;
   --color-link: #1861fc;
   --color-link-hover: #0056b3;
@@ -86,7 +87,7 @@ code {
   background-color: #eeead6;
   padding: 5px 0.4em;
   border-radius: 3px;
-  color: #333;
+  color: var(--color-lighter);
   overflow-wrap: break-word;
   word-break: break-all;
   -webkit-box-decoration-break: clone;
@@ -131,6 +132,18 @@ hr {
 .description-field {
   font-size: var(--font-size);
   line-height: var(--line-height);
+}
+
+.item-timestamps {
+  font-size: 0.9rem;
+  color: var(--color-lighter);
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.content-block .item-description {
+  margin-bottom: 1em;
 }
 
 /* Footer */

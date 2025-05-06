@@ -351,3 +351,25 @@ export function processItemDescription(description: string): {
     isPinned,
   };
 }
+
+/**
+ * Formats a date string into a human-readable format
+ * @param dateString ISO format date string
+ * @returns Formatted date string (e.g., "May 6, 2025, 3:30 PM")
+ */
+export function formatDate(dateString: string): string {
+  if (!dateString) return "";
+
+  const date = new Date(dateString);
+
+  // Check if the date is valid
+  if (isNaN(date.getTime())) return "";
+
+  return date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
