@@ -144,9 +144,14 @@ export function renderHomePage(
 
   // Sort items to put pinned items at the top
   processedItems.sort((a, b) => {
+    // First priority: pinned status
     if (a.isPinned && !b.isPinned) return -1;
     if (!a.isPinned && b.isPinned) return 1;
-    return 0;
+
+    // Second priority: created_at date (newest first)
+    const dateA = new Date(a.item.created_at);
+    const dateB = new Date(b.item.created_at);
+    return dateB.getTime() - dateA.getTime(); // Descending order (newest first)
   });
 
   // Join all blocks together
