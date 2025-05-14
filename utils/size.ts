@@ -10,148 +10,170 @@ import fs from "fs";
 import path from "path";
 import zlib from "zlib";
 import { JSDOM } from "jsdom";
+import http from "http";
+import https from "https";
+
+const ESTIMATED_EXTERNAL_IMAGE_SIZE = 300 * 1024; // Fallback size: 300KB. In case the HTTP HEAD request fails to determine the actual size of an external image.
+
+/**
+ * Get size of external resource using HTTP HEAD request
+ */
+function getExternalResourceSize(url) {
+  return new Promise((resolve) => {
+    const protocol = url.startsWith("https") ? https : http;
+    const req = protocol.request(
+      url,
+      { method: "HEAD", timeout: 3000 },
+      (res) => {
+        const contentLength = res.headers["content-length"];
+        if (contentLength) {
+          resolve(parseInt(contentLength, 10));
+        } else {
+          resolve(ESTIMATED_EXTERNAL_IMAGE_SIZE);
+        }
+      },
+    );
+
+    req.on("error", () => resolve(ESTIMATED_EXTERNAL_IMAGE_SIZE));
+    req.on("timeout", () => {
+      req.destroy();
+      resolve(ESTIMATED_EXTERNAL_IMAGE_SIZE);
+    });
+
+    req.end();
+  });
+}
 
 /**
  * Measures the total size of a page including all its resources
- * @param filePath Path to the HTML file to measure
- * @param basePath Base directory to look for resources
  */
-export function measurePageSize(
-  filePath: string,
-  basePath: string = path.dirname(filePath),
-): void {
+export async function measurePageSize(
+  filePath,
+  basePath = path.dirname(filePath),
+) {
   try {
-    // Read the file content
+    // Read and parse HTML
     const content = fs.readFileSync(filePath, "utf8");
-
-    // Parse the HTML to extract resource references
     const dom = new JSDOM(content);
     const document = dom.window.document;
 
     // Start with the HTML file size
     let totalSize = getCompressedSize(content);
-    const resources: { type: string; path: string; size: number }[] = [];
+    let allResources: Array<{
+      type: string;
+      path: string;
+      size: number;
+      external?: boolean;
+    }> = [];
+    let externalImages: string[] = [];
 
-    // Track CSS files
-    const cssLinks = document.querySelectorAll('link[rel="stylesheet"]');
-    cssLinks.forEach((link) => {
-      const href = link.getAttribute("href");
-      if (href) {
-        const resourcePath = path.resolve(
-          basePath,
-          href.startsWith("/") ? path.join(basePath, "..", href) : href,
-        );
-        if (fs.existsSync(resourcePath)) {
-          const size = getCompressedFileSize(resourcePath);
-          totalSize += size;
-          resources.push({ type: "CSS", path: href, size });
-        }
-      }
-    });
+    // Process all resource types
+    const resourceTypes = [
+      {
+        selector: 'link[rel="stylesheet"]',
+        attribute: "href",
+        type: "CSS",
+        compressible: true,
+      },
+      {
+        selector: "script[src]",
+        attribute: "src",
+        type: "JS",
+        compressible: true,
+      },
+      {
+        selector: "img",
+        attribute: "src",
+        type: "Image",
+        compressible: false,
+      },
+      {
+        selector:
+          'link[rel="icon"], link[rel="apple-touch-icon"], link[rel="manifest"], link[rel="shortcut icon"]',
+        attribute: "href",
+        type: "Favicon",
+        compressible: false,
+      },
+      {
+        selector: 'meta[property^="og:image"], meta[name="twitter:image"]',
+        attribute: "content",
+        type: "Metadata",
+        compressible: false,
+        filter: (src) => src && src.startsWith("/"),
+      },
+      {
+        selector:
+          'link[rel="preload"], link[rel="prefetch"], link[rel="dns-prefetch"], link[rel="preconnect"]',
+        attribute: "href",
+        type: "HeadResource",
+        compressible: false,
+        filter: (src) =>
+          src && !src.startsWith("http") && !src.startsWith("//"),
+      },
+    ];
 
-    // Track JavaScript files
-    const scripts = document.querySelectorAll("script");
-    scripts.forEach((script) => {
-      const src = script.getAttribute("src");
-      if (src) {
-        const resourcePath = path.resolve(
-          basePath,
-          src.startsWith("/") ? path.join(basePath, "..", src) : src,
-        );
-        if (fs.existsSync(resourcePath)) {
-          const size = getCompressedFileSize(resourcePath);
-          totalSize += size;
-          resources.push({ type: "JS", path: src, size });
-        }
-      }
-    });
+    // Process each resource type
+    resourceTypes.forEach(
+      ({ selector, attribute, type, compressible, filter }) => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach((element) => {
+          const src = element.getAttribute(attribute);
 
-    // Track images
-    const images = document.querySelectorAll("img");
-    images.forEach((img) => {
-      const src = img.getAttribute("src");
-      if (src) {
-        const resourcePath = resolveResourcePath(src, basePath);
+          // Skip if src is missing or doesn't match filter
+          if (!src || (filter && !filter(src))) return;
 
-        if (fs.existsSync(resourcePath)) {
-          const size = getFileSize(resourcePath); // Images are usually already compressed
-          totalSize += size;
-          resources.push({ type: "Image", path: src, size });
-        }
-      }
-    });
+          // Handle external resources
+          if (src.startsWith("http") || src.startsWith("//")) {
+            if (type === "Image") {
+              externalImages.push(src);
+            }
+            return;
+          }
 
-    // Track favicon files
-    const favicons = document.querySelectorAll(
-      'link[rel="icon"], link[rel="apple-touch-icon"], link[rel="manifest"], link[rel="shortcut icon"]',
+          const resourcePath = resolveResourcePath(src, basePath);
+          if (resourcePath && fs.existsSync(resourcePath)) {
+            const size = compressible
+              ? getCompressedFileSize(resourcePath)
+              : getFileSize(resourcePath);
+
+            totalSize += size;
+            allResources.push({ type, path: src, size });
+          }
+        });
+      },
     );
-    favicons.forEach((favicon) => {
-      const href = favicon.getAttribute("href");
-      if (href) {
-        const resourcePath = path.resolve(
-          basePath,
-          href.startsWith("/") ? path.join(basePath, "..", href) : href,
-        );
-        if (fs.existsSync(resourcePath)) {
-          const size = getFileSize(resourcePath);
-          totalSize += size;
-          resources.push({ type: "Favicon", path: href, size });
-        }
-      }
-    });
 
-    // Track metadata (open graph images, etc.)
-    const metaTags = document.querySelectorAll(
-      'meta[property^="og:image"], meta[name="twitter:image"]',
-    );
-    metaTags.forEach((meta) => {
-      const content = meta.getAttribute("content");
-      if (content && content.startsWith("/")) {
-        // Only process local files, not external URLs
-        const resourcePath = path.resolve(
-          basePath,
-          content.startsWith("/")
-            ? path.join(basePath, "..", content)
-            : content,
-        );
-        if (fs.existsSync(resourcePath)) {
-          const size = getFileSize(resourcePath);
-          totalSize += size;
-          resources.push({ type: "Metadata", path: content, size });
-        }
-      }
-    });
+    // Get sizes for external images
+    let externalImageSizes = 0;
+    if (externalImages.length > 0) {
+      const sizes = await Promise.all(
+        externalImages.map((url) => getExternalResourceSize(url)),
+      );
 
-    // Track any other head resources like preload, prefetch
-    const headResources = document.querySelectorAll(
-      'link[rel="preload"], link[rel="prefetch"], link[rel="dns-prefetch"], link[rel="preconnect"]',
-    );
-    headResources.forEach((resource) => {
-      const href = resource.getAttribute("href");
-      if (href && !href.startsWith("http") && !href.startsWith("//")) {
-        // Only process local files, not external URLs
-        const resourcePath = path.resolve(
-          basePath,
-          href.startsWith("/") ? path.join(basePath, "..", href) : href,
-        );
-        if (fs.existsSync(resourcePath)) {
-          const size = getFileSize(resourcePath);
-          totalSize += size;
-          resources.push({ type: "HeadResource", path: href, size });
-        }
-      }
-    });
+      sizes.forEach((size, i) => {
+        const numericSize =
+          typeof size === "number" ? size : ESTIMATED_EXTERNAL_IMAGE_SIZE;
+        externalImageSizes += numericSize;
+        totalSize += numericSize;
+        allResources.push({
+          type: "Image",
+          path: externalImages[i],
+          size: numericSize,
+          external: true,
+        });
+      });
+    }
 
-    // Calculate total size in KB (to 1 decimal place)
+    // Update the page with the total size
     const totalSizeKB = (totalSize / 1024).toFixed(1);
-
-    // Replace the size placeholder in the HTML
     const updated = content.replace(
       /<p class="size">.*?<\/p>/,
-      `<p class="size">${totalSizeKB} KB</p>`,
+      `<p class="size">${totalSizeKB} KB</p>` +
+        (externalImages.length > 0
+          ? ` <!-- Includes ${externalImages.length} external images (${(externalImageSizes / 1024).toFixed(1)} KB) -->`
+          : ""),
     );
 
-    // Write the updated content back to the file
     fs.writeFileSync(filePath, updated);
   } catch (error) {
     console.error(`Error measuring page size for ${filePath}:`, error);
@@ -159,16 +181,34 @@ export function measurePageSize(
 }
 
 /**
+ * Resolves a resource path with fallbacks for different path types
+ */
+function resolveResourcePath(src, basePath) {
+  if (!src || src.startsWith("http") || src.startsWith("//")) return "";
+
+  const isAbsolute = src.startsWith("/");
+  const pathsToTry = isAbsolute
+    ? [
+        path.resolve(basePath, "..", src.slice(1)),
+        path.resolve(process.cwd(), "build", src.slice(1)),
+        path.resolve(process.cwd(), src.slice(1)),
+      ]
+    : [path.resolve(basePath, src)];
+
+  return pathsToTry.find((p) => fs.existsSync(p)) || pathsToTry[0];
+}
+
+/**
  * Gets the compressed size of a string
  */
-function getCompressedSize(content: string): number {
+function getCompressedSize(content) {
   return zlib.gzipSync(Buffer.from(content)).length;
 }
 
 /**
  * Gets the compressed size of a file
  */
-function getCompressedFileSize(filePath: string): number {
+function getCompressedFileSize(filePath) {
   const content = fs.readFileSync(filePath);
   return zlib.gzipSync(content).length;
 }
@@ -176,81 +216,42 @@ function getCompressedFileSize(filePath: string): number {
 /**
  * Gets the raw size of a file (for already compressed formats)
  */
-function getFileSize(filePath: string): number {
-  const stats = fs.statSync(filePath);
-  return stats.size;
+function getFileSize(filePath) {
+  return fs.statSync(filePath).size;
 }
 
 /**
  * Process all HTML files in a directory
  */
-export function processDirectory(directory: string): void {
+export async function processDirectory(directory) {
   const buildDir = path.resolve(directory);
+  if (!fs.existsSync(buildDir)) return;
 
-  // Check if the build directory exists
-  if (!fs.existsSync(buildDir)) {
-    return;
-  }
-
-  // Process index.html in the root
+  // Process root index.html
   const indexPath = path.join(buildDir, "index.html");
   if (fs.existsSync(indexPath)) {
-    measurePageSize(indexPath, buildDir);
-  } else {
-    console.warn(`Index file not found: ${indexPath}`);
+    await measurePageSize(indexPath, buildDir);
   }
 
+  // Process subdirectories
   try {
-    // Process subdirectories (for item pages)
-    fs.readdirSync(buildDir, { withFileTypes: true })
-      .filter((dirent) => dirent.isDirectory())
-      .forEach((dirent) => {
-        const itemIndexPath = path.join(buildDir, dirent.name, "index.html");
-        if (fs.existsSync(itemIndexPath)) {
-          measurePageSize(itemIndexPath, path.join(buildDir, dirent.name));
-        }
-      });
+    const subdirs = fs
+      .readdirSync(buildDir, { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory());
+
+    for (const dirent of subdirs) {
+      const itemIndexPath = path.join(buildDir, dirent.name, "index.html");
+      if (fs.existsSync(itemIndexPath)) {
+        await measurePageSize(itemIndexPath, path.join(buildDir, dirent.name));
+      }
+    }
   } catch (error) {
     console.error(`Error processing subdirectories in ${buildDir}:`, error);
   }
 }
 
-function resolveResourcePath(src, basePath) {
-  // Skip external URLs
-  if (src.startsWith("http") || src.startsWith("//")) {
-    return "";
-  }
-
-  // For absolute paths (starting with /)
-  if (src.startsWith("/")) {
-    // First try the normal resolution
-    const normalPath = path.resolve(basePath, "..", src.slice(1));
-
-    // If it exists, return it
-    if (fs.existsSync(normalPath)) {
-      return normalPath;
-    }
-
-    // Otherwise try alternative resolutions
-    const altPaths = [
-      path.resolve(process.cwd(), "build", src.slice(1)), // Try from build root
-      path.resolve(process.cwd(), src.slice(1)), // Try from project root
-    ];
-
-    for (const altPath of altPaths) {
-      if (fs.existsSync(altPath)) {
-        return altPath;
-      }
-    }
-
-    // Fall back to original behavior
-    return normalPath;
-  }
-
-  // For relative paths (not starting with /)
-  return path.resolve(basePath, src);
-}
-
-// Main execution - directly process the directory passed as an argument
+// Main execution
 const directory = process.argv[2] || "./build";
-processDirectory(directory);
+(async () => {
+  await processDirectory(directory);
+})();
