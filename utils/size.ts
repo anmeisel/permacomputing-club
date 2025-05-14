@@ -71,10 +71,8 @@ export function measurePageSize(
     images.forEach((img) => {
       const src = img.getAttribute("src");
       if (src) {
-        const resourcePath = path.resolve(
-          basePath,
-          src.startsWith("/") ? path.join(basePath, "..", src) : src,
-        );
+        const resourcePath = resolveResourcePath(src, basePath);
+
         if (fs.existsSync(resourcePath)) {
           const size = getFileSize(resourcePath); // Images are usually already compressed
           totalSize += size;
@@ -215,6 +213,42 @@ export function processDirectory(directory: string): void {
   } catch (error) {
     console.error(`Error processing subdirectories in ${buildDir}:`, error);
   }
+}
+
+function resolveResourcePath(src, basePath) {
+  // Skip external URLs
+  if (src.startsWith("http") || src.startsWith("//")) {
+    return "";
+  }
+
+  // For absolute paths (starting with /)
+  if (src.startsWith("/")) {
+    // First try the normal resolution
+    const normalPath = path.resolve(basePath, "..", src.slice(1));
+
+    // If it exists, return it
+    if (fs.existsSync(normalPath)) {
+      return normalPath;
+    }
+
+    // Otherwise try alternative resolutions
+    const altPaths = [
+      path.resolve(process.cwd(), "build", src.slice(1)), // Try from build root
+      path.resolve(process.cwd(), src.slice(1)), // Try from project root
+    ];
+
+    for (const altPath of altPaths) {
+      if (fs.existsSync(altPath)) {
+        return altPath;
+      }
+    }
+
+    // Fall back to original behavior
+    return normalPath;
+  }
+
+  // For relative paths (not starting with /)
+  return path.resolve(basePath, src);
 }
 
 // Main execution - directly process the directory passed as an argument
