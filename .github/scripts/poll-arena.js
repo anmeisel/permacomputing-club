@@ -16,109 +16,142 @@ const vercelToken = process.env.VERCEL_API_TOKEN;
 
 const COUNT_FILE = path.join(__dirname, "arena_count.txt");
 
-// Subsequent runs: Reads from arena_count.txt → only deploys if count changed
-
 async function getBlockCount() {
-  const res = await fetch(`https://api.are.na/v2/channels/${channel}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  try {
+    console.log(`Fetching Arena channel: ${channel}`);
+    const res = await fetch(`https://api.are.na/v2/channels/${channel}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  const data = await res.json();
-  return data.contents.length;
+    if (!res.ok) {
+      throw new Error(`Arena API failed: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    console.log(
+      `Arena channel "${data.title}" has ${data.contents.length} blocks`,
+    );
+    return data.contents.length;
+  } catch (error) {
+    console.error("Error fetching Arena data:", error.message);
+    throw error;
+  }
 }
 
 async function getPreviousCount() {
   try {
     const count = await fs.readFile(COUNT_FILE, "utf8");
-    return parseInt(count.trim(), 10);
+    const parsed = parseInt(count.trim(), 10);
+    console.log(`Previous count from cache: ${parsed}`);
+    return parsed;
   } catch (error) {
-    console.log("No previous count found, treating as first run");
+    console.log("No previous count found (first run or cache miss)");
     return null;
   }
 }
 
 async function savePreviousCount(count) {
-  await fs.writeFile(COUNT_FILE, count.toString());
-}
-
-async function checkDeployStatus(jobId) {
-  console.log(`Checking status of job ${jobId}...`);
-  console.log("Checking recent deployments...");
-  const listRes = await fetch(`https://api.vercel.com/v6/deployments`, {
-    headers: { Authorization: `Bearer ${vercelToken}` },
-  });
-
-  if (listRes.status === 200) {
-    const data = await listRes.json();
-    console.log(
-      `Found ${data.deployments ? data.deployments.length : 0} deployments`,
-    );
-    if (data.deployments && data.deployments.length > 0) {
-      const latestDeploy = data.deployments[0];
-      console.log(`Latest deployment state: ${latestDeploy.state}`);
-      console.log(
-        `Latest deployment created: ${new Date(latestDeploy.created).toISOString()}`,
-      );
-    }
-  } else {
-    console.log(`List deployments error: ${listRes.status}`);
+  try {
+    await fs.writeFile(COUNT_FILE, count.toString());
+    console.log(`Saved count ${count} to cache file`);
+  } catch (error) {
+    console.error("Error saving count:", error.message);
   }
-
-  return null;
 }
 
 async function triggerDeploy() {
-  console.log("Triggering Vercel deploy...");
-  const res = await fetch(webhook, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({}),
-  });
+  try {
+    console.log("Triggering Vercel deployment...");
+    console.log(`Webhook URL (partial): ${webhook.substring(0, 50)}...`);
 
-  if (res.status === 201) {
-    const jsonData = await res.json();
-    console.log("Deploy job triggered successfully");
-    return jsonData;
-  } else {
-    console.log(`Deploy trigger failed with status: ${res.status}`);
+    const res = await fetch(webhook, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+
+    console.log(`Deploy webhook response: ${res.status} ${res.statusText}`);
+
+    if (res.status === 201) {
+      const jsonData = await res.json();
+      console.log("Deploy triggered successfully:", jsonData);
+      return jsonData;
+    } else {
+      const errorText = await res.text();
+      console.error(`Deploy failed: ${res.status} - ${errorText}`);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error triggering deploy:", error.message);
     return null;
   }
 }
 
-(async () => {
-  console.log("Checking Arena for changes...");
+async function checkDeployStatus(jobId) {
+  try {
+    console.log(`Checking deployment status for job: ${jobId}`);
+    const listRes = await fetch(`https://api.vercel.com/v6/deployments`, {
+      headers: { Authorization: `Bearer ${vercelToken}` },
+    });
 
-  const currentCount = await getBlockCount();
-  const previousCount = await getPreviousCount();
-
-  console.log(`Current block count: ${currentCount}`);
-  console.log(`Previous block count: ${previousCount}`);
-
-  // Check if there are changes
-  if (previousCount === null || currentCount !== previousCount) {
-    if (previousCount === null) {
-      console.log("First run - triggering initial deploy");
+    if (listRes.ok) {
+      const data = await listRes.json();
+      if (data.deployments && data.deployments.length > 0) {
+        const latest = data.deployments[0];
+        console.log(
+          `Latest deployment: ${latest.state} (${latest.url || "no URL"})`,
+        );
+      }
     } else {
-      console.log(
-        `Block count changed from ${previousCount} to ${currentCount} - triggering deploy`,
-      );
+      console.log(`Could not fetch deployment status: ${listRes.status}`);
     }
-
-    // Save the new count
-    await savePreviousCount(currentCount);
-
-    // Trigger deploy
-    const jsonData = await triggerDeploy();
-    if (jsonData && jsonData.job && jsonData.job.id) {
-      await checkDeployStatus(jsonData.job.id);
-    } else {
-      console.log("No valid job ID received from deploy trigger");
-    }
-  } else {
-    console.log("No changes detected - skipping deployment");
+  } catch (error) {
+    console.error("Error checking deployment status:", error.message);
   }
+}
 
-  console.log("Arena check completed");
+(async () => {
+  try {
+    console.log("=== Arena Check Starting ===");
+    console.log(`Environment check - Channel: ${channel ? "OK" : "MISSING"}`);
+    console.log(`Environment check - Arena Token: ${token ? "OK" : "MISSING"}`);
+    console.log(`Environment check - Webhook: ${webhook ? "OK" : "MISSING"}`);
+    console.log(
+      `Environment check - Vercel Token: ${vercelToken ? "OK" : "MISSING"}`,
+    );
+
+    const currentCount = await getBlockCount();
+    const previousCount = await getPreviousCount();
+
+    console.log(`\nCOMPARISON:`);
+    console.log(`  Current: ${currentCount}`);
+    console.log(`  Previous: ${previousCount}`);
+    console.log(
+      `  Changed: ${previousCount === null || currentCount !== previousCount}`,
+    );
+
+    if (previousCount === null || currentCount !== previousCount) {
+      if (previousCount === null) {
+        console.log("\n→ FIRST RUN: Triggering initial deployment");
+      } else {
+        console.log(`\n→ CHANGE DETECTED: ${previousCount} → ${currentCount}`);
+      }
+
+      await savePreviousCount(currentCount);
+
+      const deployResult = await triggerDeploy();
+      if (deployResult && deployResult.job && deployResult.job.id) {
+        await checkDeployStatus(deployResult.job.id);
+      }
+    } else {
+      console.log("\n→ NO CHANGES: Skipping deployment");
+    }
+
+    console.log("\n=== Arena Check Complete ===");
+  } catch (error) {
+    console.error("Fatal error:", error.message);
+    process.exit(1);
+  }
 })();
