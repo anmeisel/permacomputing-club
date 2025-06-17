@@ -33,6 +33,7 @@ A site to keep club updates, projects, notes and thoughts about permacomputing.
     - `rimraf` - Cross-platform directory removal
     - `jsdom` - Parses HTML to measure page size
     - `vercel` - Deployment and hosting
+    - `serve` – Serves static files
 2. `npm run build:preview` - Build and preview in one step
 
 ### Scripts

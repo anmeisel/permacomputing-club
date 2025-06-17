@@ -22,5 +22,11 @@
     "title": "Screening",
     "class": "Text",
     "original_title": "Screening"
+  },
+  "update-next-monday": {
+    "id": 37497193,
+    "title": "Update: Next Monday",
+    "class": "Text",
+    "original_title": "Update: Next Monday"
   }
 }
