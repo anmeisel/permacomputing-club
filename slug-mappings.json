@@ -23,10 +23,16 @@
     "class": "Text",
     "original_title": "Screening"
   },
-  "update-next-monday": {
-    "id": 37497193,
-    "title": "Update: Next Monday",
+  "day-out-symposium-and-conference": {
+    "id": 37698881,
+    "title": "Day out - symposium and conference",
     "class": "Text",
-    "original_title": "Update: Next Monday"
+    "original_title": "Day out - symposium and conference"
+  },
+  "computer-art-film-screening": {
+    "id": 37715064,
+    "title": "Computer Art Film Screening",
+    "class": "Text",
+    "original_title": "Computer Art Film Screening"
   }
 }
