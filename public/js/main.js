@@ -3,19 +3,6 @@
 // Filters items in appropriate sidebars while hiding them from main content.
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Check for notes
-  function hasNotesTag(block) {
-    const tagsContainer = block.querySelector(".item-tags");
-    if (!tagsContainer) return false;
-
-    const tagLinks = tagsContainer.querySelectorAll(".tag-link");
-    return Array.from(tagLinks).some((link) => {
-      const linkText = link.textContent.trim();
-      const linkTag = linkText.substring(1);
-      return linkTag.toLowerCase() === "notes";
-    });
-  }
-
   // Function to filter items based on tag in URL hash
   function filterItemsByTag() {
     // Get the current hash from the URL without the # symbol
@@ -28,11 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!currentTag) {
       // Show all content blocks in main content
       document.querySelectorAll(".content-block").forEach((block) => {
-        if (hasNotesTag(block)) {
-          block.style.display = "none"; // Always hide notes from main content
-        } else {
-          block.style.display = "block";
-        }
+        block.style.display = "block";
       });
 
       // Clear any filtered content from sidebars (keep original titles)
@@ -93,11 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
         block.style.display = "none";
       } else {
         // Show items that don't match in main content, but always hide notes
-        if (hasNotesTag(block)) {
-          block.style.display = "none";
-        } else {
-          block.style.display = "block";
-        }
+        block.style.display = "block";
       }
     });
 
@@ -158,12 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
 
-      // Always hide notes from main content, show others based on tag match
-      if (hasNotesTag(block)) {
-        block.style.display = "none";
-      } else {
-        block.style.display = hasMatchingTag ? "block" : "none";
-      }
+      block.style.display = hasMatchingTag ? "block" : "none";
     });
 
     // Show message if no items match the tag

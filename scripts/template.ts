@@ -65,82 +65,95 @@ export function getNavigationLinks(slugMap: Map<string, ArenaItem>): string {
  * @param templatesDir Directory containing templates
  * @returns Rendered HTML for home page
  */
-export function renderHomePage(
+export async function renderHomePage(
   channelData: ArenaChannel,
   slugMap: Map<string, ArenaItem>,
   templatesDir: string,
-): string {
+): Promise<string> {
   // Process all items to create blocks and identify pinned items
-  const processedItems = channelData.contents.map((item: ArenaItem) => {
-    // Prioritise title for display
-    let displayTitle = "";
+  const processedItems = await Promise.all(
+    channelData.contents.map(async (item: ArenaItem) => {
+      // Prioritise title for display
+      let displayTitle = "";
 
-    // Check if item has a title and it's not empty
-    if (item.title && item.title.trim() !== "") {
-      displayTitle = item.title;
-    }
-    // If no title, fall back to content
-    else if (item.content && item.content.trim() !== "") {
-      // For content, limit to first 50 chars to avoid very long titles
-      displayTitle =
-        item.content.length > 50
-          ? item.content.substring(0, 50) + "..."
-          : item.content;
-    }
-    // Last resort - use ID with untitled prefix
-    else {
-      displayTitle = `Untitled #${item.id}`;
-    }
+      // Check if item has a title and it's not empty
+      if (item.title && item.title.trim() !== "") {
+        displayTitle = item.title;
+      }
+      // If no title, fall back to content
+      else if (item.content && item.content.trim() !== "") {
+        // For content, limit to first 50 chars to avoid very long titles
+        displayTitle =
+          item.content.length > 50
+            ? item.content.substring(0, 50) + "..."
+            : item.content;
+      }
+      // Last resort - use ID with untitled prefix
+      else {
+        displayTitle = `Untitled #${item.id}`;
+      }
 
-    // Generate slug from the same source used for display title
-    const slugSource =
-      item.title && item.title.trim() !== ""
-        ? item.title
-        : item.content && item.content.trim() !== ""
-          ? item.content
-          : `untitled-${item.id}`;
+      // Generate slug from the same source used for display title
+      const slugSource =
+        item.title && item.title.trim() !== ""
+          ? item.title
+          : item.content && item.content.trim() !== ""
+            ? item.content
+            : `untitled-${item.id}`;
 
-    const slug = generateSlug(slugSource);
+      const slug = generateSlug(slugSource);
 
-    // Process item description ONCE to get both HTML and isPinned
-    const { html: itemDescription, isPinned } = item.description
-      ? processItemDescription(item.description)
-      : { html: "", isPinned: false }; // Ensure the fallback provides both
+      // Process item description ONCE to get both HTML and isPinned
+      const { html: itemDescription, isPinned } = item.description
+        ? processItemDescription(item.description)
+        : { html: "", isPinned: false };
 
-    // Extract colour and border information from description if available
-    const { backgroundColor, borderColor } = item.description
-      ? extractColourFromDescription(item.description)
-      : { backgroundColor: "", borderColor: "" }; // Ensure fallback provides both
+      // Check if the item has a "notes" tag in its description
+      const hasNotesTag = item.description
+        ? item.description.toLowerCase().includes("tag: notes") ||
+          item.description.toLowerCase().includes("tags: notes") ||
+          item.description.toLowerCase().includes("#notes")
+        : false;
 
-    // Build the style attribute string
-    let styleAttribute = "";
-    const styles: string[] = [];
-    if (backgroundColor) {
-      styles.push(`background-color: ${backgroundColor}`);
-    }
-    if (borderColor) {
-      styles.push(`border: 1px solid ${borderColor}`); // Example border style
-    }
-    if (styles.length > 0) {
-      styleAttribute = ` style="${styles.join("; ")};"`;
-    }
+      // Process item content if it has notes tag
+      const itemContent = hasNotesTag ? await processItemContent(item) : "";
 
-    // Create the HTML block for this item
-    const blockHtml = `<div class="content-block${isPinned ? " pinned" : ""}" data-id="${item.id}"${styleAttribute}>
-      <h2><a href="/${slug}">${displayTitle}</a></h2>
-      ${itemDescription ? `<div class="item-description">${itemDescription}</div>` : ""}
-      <div class="item-timestamps">
-        <span class="timestamp created">Created: ${formatDate(item.created_at)}</span>
-        <span class="timestamp updated">Updated: ${formatDate(item.updated_at)}</span>
-      </div>
-    </div>`;
+      // Extract colour and border information from description if available
+      const { backgroundColor, borderColor } = item.description
+        ? extractColourFromDescription(item.description)
+        : { backgroundColor: "", borderColor: "" };
 
-    return {
-      html: blockHtml,
-      isPinned,
-      item,
-    };
-  });
+      // Build the style attribute string
+      let styleAttribute = "";
+      const styles: string[] = [];
+      if (backgroundColor) {
+        styles.push(`background-color: ${backgroundColor}`);
+      }
+      if (borderColor) {
+        styles.push(`border: 1px solid ${borderColor}`);
+      }
+      if (styles.length > 0) {
+        styleAttribute = ` style="${styles.join("; ")};"`;
+      }
+
+      // Create the HTML block for this item
+      const blockHtml = `<div class="content-block${isPinned ? " pinned" : ""}${hasNotesTag ? " notes" : ""}" data-id="${item.id}"${styleAttribute}>
+        <h2><a href="/${slug}">${displayTitle}</a></h2>
+        ${itemDescription ? `<div class="item-description">${itemDescription}</div>` : ""}
+        ${hasNotesTag && itemContent ? `<div class="item-content">${itemContent}</div>` : ""}
+        <div class="item-timestamps">
+          <span class="timestamp created">Created: ${formatDate(item.created_at)}</span>
+          <span class="timestamp updated">Updated: ${formatDate(item.updated_at)}</span>
+        </div>
+      </div>`;
+
+      return {
+        html: blockHtml,
+        isPinned,
+        item,
+      };
+    }),
+  );
 
   // Sort items to put pinned items at the top
   processedItems.sort((a, b) => {
@@ -151,7 +164,7 @@ export function renderHomePage(
     // Second priority: created_at date (newest first)
     const dateA = new Date(a.item.created_at);
     const dateB = new Date(b.item.created_at);
-    return dateB.getTime() - dateA.getTime(); // Descending order (newest first)
+    return dateB.getTime() - dateA.getTime();
   });
 
   // Join all blocks together
@@ -162,7 +175,6 @@ export function renderHomePage(
     {
       channelTitle: channelData.title,
       totalBlocks: channelData.contents.length,
-      // Pass the blocks HTML here, which already includes the description
       blocks: blocks,
     },
   );

@@ -65,12 +65,12 @@ export function copyStaticAssets(srcDir: string): void {
  * @param slugMap Map of slugs to ArenaItems
  * @param templatesDir Directory containing templates
  */
-export function generateHomePage(
+export async function generateHomePage(
   channelData: ArenaChannel,
   slugMap: Map<string, ArenaItem>,
   templatesDir: string,
-): void {
-  const homeHtml = renderHomePage(channelData, slugMap, templatesDir);
+): Promise<void> {
+  const homeHtml = await renderHomePage(channelData, slugMap, templatesDir);
   const homeFilePath = path.join(BUILD_DIR, "index.html");
 
   // Write home page to build directory
@@ -161,7 +161,7 @@ export async function generateStaticPages(
     copyStaticAssets(sourceDir);
 
     // Generate home page
-    generateHomePage(channelData, slugMap, templatesDir);
+    await generateHomePage(channelData, slugMap, templatesDir);
 
     // Generate item pages - Pass channelData here
     await generateItemPages(slugMap, templatesDir, channelData);
