@@ -194,7 +194,14 @@ document.addEventListener("DOMContentLoaded", function () {
       // Extract the tag from href (e.g., "/#notes" -> "notes")
       if (href && href.startsWith("/#")) {
         const tag = href.substring(2);
-        window.location.href = window.location.origin + "/#" + tag;
+        const currentTag = window.location.hash.substring(1);
+
+        // Toggle functionality: if current tag matches clicked tag, clear it
+        if (currentTag === tag) {
+          window.location.href = window.location.origin + "/";
+        } else {
+          window.location.href = window.location.origin + "/#" + tag;
+        }
       }
     });
   });

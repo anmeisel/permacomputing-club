@@ -50,6 +50,10 @@ main {
   flex: 1.5;
 }
 
+.main-content .notes {
+  display: none !important;
+}
+
 .right h1 {
   text-align: right;
 }
