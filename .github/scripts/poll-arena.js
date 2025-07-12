@@ -1,9 +1,8 @@
 // This script checks for changes in an Arena channel and triggers a Vercel deployment if changes are detected. It will:
-// 1. Log the (partial) webhook URL for verification
-// 2. Trigger the deploy
-// 3. Parse the response and extract the job ID
-// 4. Check the deployment status using the Vercel API
-// 5. Log the deployment status and project ID
+// 1. Check the current block count from Arena
+// 2. Compare with previously cached count
+// 3. Only deploy if there's a change (or first run)
+// 4. Save the new count to cache
 
 const fetch = require("node-fetch");
 const fs = require("fs").promises;
@@ -46,14 +45,17 @@ async function getPreviousCount() {
     return parsed;
   } catch (error) {
     console.log("No previous count found (first run or cache miss)");
+    console.log(`Cache file path: ${COUNT_FILE}`);
     return null;
   }
 }
 
 async function savePreviousCount(count) {
   try {
+    // Ensure directory exists
+    await fs.mkdir(path.dirname(COUNT_FILE), { recursive: true });
     await fs.writeFile(COUNT_FILE, count.toString());
-    console.log(`Saved count ${count} to cache file`);
+    console.log(`Saved count ${count} to cache file: ${COUNT_FILE}`);
   } catch (error) {
     console.error("Error saving count:", error.message);
   }
@@ -139,6 +141,7 @@ async function checkDeployStatus(jobId) {
         console.log(`\n→ CHANGE DETECTED: ${previousCount} → ${currentCount}`);
       }
 
+      // Save the new count BEFORE triggering deploy
       await savePreviousCount(currentCount);
 
       const deployResult = await triggerDeploy();
@@ -147,6 +150,7 @@ async function checkDeployStatus(jobId) {
       }
     } else {
       console.log("\n→ NO CHANGES: Skipping deployment");
+      console.log("The script is working correctly - no deployment needed!");
     }
 
     console.log("\n=== Arena Check Complete ===");

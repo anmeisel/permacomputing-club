@@ -21,12 +21,24 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .github/scripts/arena_count.txt
-          key: arena-count-v1
+          key: arena-count-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
+            arena-count-${{ runner.os }}-
             arena-count-
 
       - name: Install dependencies
         run: npm install node-fetch@2
+
+      - name: Debug cache status
+        run: |
+          echo "Checking for existing cache file..."
+          if [ -f .github/scripts/arena_count.txt ]; then
+            echo "Cache file exists with content:"
+            cat .github/scripts/arena_count.txt
+          else
+            echo "Cache file does not exist"
+          fi
+          ls -la .github/scripts/ || echo "Scripts directory doesn't exist"
 
       - name: Run polling script
         run: node .github/scripts/poll-arena.js
@@ -35,3 +47,13 @@ jobs:
           CHANNEL_SLUG: ${{ secrets.CHANNEL_SLUG }}
           VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
           VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
+
+      - name: Debug final cache status
+        run: |
+          echo "Final cache file status:"
+          if [ -f .github/scripts/arena_count.txt ]; then
+            echo "Cache file exists with content:"
+            cat .github/scripts/arena_count.txt
+          else
+            echo "Cache file was not created"
+          fi
