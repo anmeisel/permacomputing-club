@@ -141,7 +141,7 @@ async function checkDeployStatus(jobId) {
         console.log(`\n→ CHANGE DETECTED: ${previousCount} → ${currentCount}`);
       }
 
-      // Save the new count BEFORE triggering deploy
+      // Save the new count before triggering deploy
       await savePreviousCount(currentCount);
 
       const deployResult = await triggerDeploy();

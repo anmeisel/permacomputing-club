@@ -9,7 +9,6 @@ import {
 import { copyDirectory } from "./utils/file";
 import { measurePageSize } from "./utils/size";
 
-// Constants
 const BUILD_DIR = path.resolve(process.cwd(), "build");
 
 /**
@@ -85,7 +84,7 @@ export function generateHomePage(
  * Generates item pages and writes them to the build directory
  * @param slugMap Map of slugs to ArenaItems
  * @param templatesDir Directory containing templates
- * @param channelData Channel data from Arena (Added this parameter)
+ * @param channelData Channel data from Arena
  */
 export async function generateItemPages(
   slugMap: Map<string, ArenaItem>,

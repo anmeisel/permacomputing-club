@@ -72,7 +72,7 @@ export function renderHomePage(
 ): string {
   // Process all items to create blocks and identify pinned items
   const processedItems = channelData.contents.map((item: ArenaItem) => {
-    // Prioritize title for display
+    // Prioritise title for display
     let displayTitle = "";
 
     // Check if item has a title and it's not empty
@@ -213,7 +213,7 @@ export async function renderItemPage(
     styleAttribute = ` style="${styles.join("; ")};"`;
   }
 
-  // Prioritize title for display
+  // Prioritise title for display
   let displayTitle = "";
 
   // Check if item has a title and it's not empty

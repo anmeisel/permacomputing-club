@@ -40,8 +40,16 @@
   </head>
   <body>
     <main>
-      <h1><a href="/">{{channelTitle}}</a></h1>
-      {{content}}
+      <div class="sidebar left">
+        <h1><a href="/#notes">Notes</a></h1>
+      </div>
+      <div class="main-content">
+        <h1><a href="/">{{channelTitle}}</a></h1>
+        {{content}}
+      </div>
+      <div class="sidebar right">
+        <h1><a href="/#event">Events</a></h1>
+      </div>
     </main>
     <p class="size"></p>
     <script src="/js/main.js"></script>

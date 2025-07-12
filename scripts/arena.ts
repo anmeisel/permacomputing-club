@@ -5,7 +5,7 @@ import { generateSlug } from "../utils";
 // Arena API service
 export class ArenaService {
   private channelSlug: string;
-  private accessToken: string; // Add this line to store the access token
+  private accessToken: string;
 
   constructor(accessToken: string, channelSlug: string) {
     this.channelSlug = channelSlug;
@@ -44,7 +44,7 @@ export class ArenaService {
     const slugMap = new Map<string, ArenaItem>();
 
     channel.contents.forEach((item: ArenaItem) => {
-      // Prioritize the title field from Arena block
+      // Prioritise the title field from Arena block
       let slugSource = "";
 
       // Check if item has a title and it's not empty

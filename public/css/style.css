@@ -22,7 +22,7 @@ body {
   color: var(--color-text);
   background-color: var(--color-background);
   margin: 0;
-  padding-top: 60px;
+  padding-top: var(--padding-standard);
 }
 
 a {
@@ -36,9 +36,22 @@ nav {
 }
 
 main {
-  max-width: 700px;
+  display: flex;
+  gap: var(--padding-standard);
   margin: 0 auto;
   padding: var(--padding-standard);
+}
+
+.sidebar {
+  flex: 1;
+}
+
+.main-content {
+  flex: 1.5;
+}
+
+.right h1 {
+  text-align: right;
 }
 
 img,
@@ -46,9 +59,8 @@ video {
   max-width: 100%;
 }
 
-h1 a {
+a {
   color: var(--color-text);
-  text-decoration: none;
 }
 
 h1,
@@ -140,6 +152,10 @@ hr {
   display: flex;
   justify-content: space-between;
   width: 100%;
+}
+
+.created {
+  padding-right: var(--padding-standard);
 }
 
 .content-block .item-description {

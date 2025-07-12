@@ -29,7 +29,7 @@ export class Slug {
       const mappings: SlugMapping = {};
 
       channelData.contents.forEach((item: ArenaItem) => {
-        // Prioritize the title field from Arena block
+        // Prioritise the title field from Arena block
         let slugSource = "";
 
         // Check if item has a title and it's not empty

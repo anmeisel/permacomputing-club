@@ -304,25 +304,44 @@ export function processItemDescription(description: string): {
           .filter((tag) => tag !== "");
 
         if (tags.length > 0) {
-          const tagLinks = tags
-            .map(
-              (tag) =>
-                `<a href="/#${encodeURIComponent(tag)}" class="tag-link">#${tag}</a>`,
-            )
-            .join(" ");
-          metadataFields.push(
-            `<div class="description-field tags-field item-tags"><span class="description-key">Tags:</span> ${tagLinks}</div>`,
-          );
+          // Check if this is a single tag that should be hidden
+          if (
+            tags.length === 1 &&
+            (tags[0].toLowerCase() === "notes" ||
+              tags[0].toLowerCase() === "event")
+          ) {
+            // Still create the tags container for main.js filtering but hide it
+            const tagLinks = tags
+              .map(
+                (tag) =>
+                  `<a href="/#${encodeURIComponent(tag)}" class="tag-link">#${tag}</a>`,
+              )
+              .join(" ");
+            metadataFields.push(
+              `<div class="description-field tags-field item-tags" style="display: none;"><span class="description-key">Tags:</span> ${tagLinks}</div>`,
+            );
+          } else {
+            // For mixed tags, show all tags normally
+            const tagLinks = tags
+              .map(
+                (tag) =>
+                  `<a href="/#${encodeURIComponent(tag)}" class="tag-link">#${tag}</a>`,
+              )
+              .join(" ");
+            metadataFields.push(
+              `<div class="description-field tags-field item-tags"><span class="description-key">Tags:</span> ${tagLinks}</div>`,
+            );
+          }
         }
       } else if (key === "author") {
-        // Assuming author value is a slug or username
+        // Author value is a slug/username
         metadataFields.push(
           `<div class="description-field author-field"><span class="description-key">Author:</span> <a href="/${encodeURIComponent(value)}">${value}</a></div>`,
         );
       }
     } else {
       // If it doesn't match a description format, add to markdown content
-      // Add double newline after each line to ensure proper markdown spacing
+      // Newline after each line to ensure proper markdown spacing
       markdownContent += trimmedLine + "\n\n";
     }
   }

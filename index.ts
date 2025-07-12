@@ -5,10 +5,8 @@ import { ArenaService } from "./scripts/arena";
 import { Slug } from "./scripts/slug";
 import { generateStaticPages } from "./build";
 
-// Load environment variables
 dotenv.config();
 
-// Constants
 const CHANNEL_SLUG =
   process.env.CHANNEL_SLUG ??
   (() => {
