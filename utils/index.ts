@@ -318,7 +318,7 @@ export function processItemDescription(description: string): {
               )
               .join(" ");
             metadataFields.push(
-              `<div class="description-field tags-field item-tags" style="display: none;"><span class="description-key">Tags:</span> ${tagLinks}</div>`,
+              `<div class="description-field tags-field item-tags"><span class="description-key">Tags:</span> ${tagLinks}</div>`,
             );
           } else {
             // For mixed tags, show all tags normally

@@ -142,8 +142,8 @@ export async function renderHomePage(
         ${itemDescription ? `<div class="item-description">${itemDescription}</div>` : ""}
         ${hasNotesTag && itemContent ? `<div class="item-content">${itemContent}</div>` : ""}
         <div class="item-timestamps">
-          <span class="timestamp created">Created: ${formatDate(item.created_at)}</span>
-          <span class="timestamp updated">Updated: ${formatDate(item.updated_at)}</span>
+          <span class="created">Created: ${formatDate(item.created_at)}</span>
+          <span class="updated">Updated: ${formatDate(item.updated_at)}</span>
         </div>
       </div>`;
 

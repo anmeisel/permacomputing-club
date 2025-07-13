@@ -1,5 +1,7 @@
 :root {
   --font-family: Times;
+  --font-size-small: 10px;
+  --font-size-medium: 15px;
   --font-size: 20px;
   --line-height: 1.5;
   --color-text: #3f3f3f;
@@ -87,8 +89,8 @@ figure {
 }
 
 figure figcaption {
-  font-size: 14px;
-  line-height: 15px;
+  font-size: var(--font-size-medium);
+  line-height: var(--font-size-medium);
 }
 
 iframe {
@@ -99,7 +101,7 @@ iframe {
 
 code {
   font-family: "Courier", monospace;
-  font-size: 18px;
+  font-size: var(--font-size-medium);
   background-color: #eeead6;
   padding: 5px 0.4em;
   border-radius: 3px;
@@ -137,25 +139,31 @@ hr {
   margin-bottom: var(--padding-standard);
 }
 
-/* Pinned content styling */
-/* .pinned {
-} */
-
 .item-description {
   margin-top: var(--padding-standard);
 }
 
+.tags-field {
+  font-size: var(--font-size-small);
+}
+
+.author-field {
+  font-size: var(--font-size-medium);
+}
+
 .description-field {
-  font-size: var(--font-size);
   line-height: var(--line-height);
 }
 
 .item-timestamps {
-  font-size: 0.9rem;
   color: var(--color-lighter);
   display: flex;
   justify-content: space-between;
   width: 100%;
+}
+
+.item-timestamps span {
+  font-size: var(--font-size-small);
 }
 
 .created {
@@ -182,8 +190,46 @@ footer {
 /* Mobile */
 
 @media (max-width: 768px) {
+  :root {
+    --font-size: 15px;
+    --font-size-medium: 10px;
+    --font-size-small: 5px;
+  }
+
   body {
-    padding-top: 20px;
+    padding-top: 0;
+  }
+
+  main {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .sidebar.left {
+    order: 1;
+  }
+
+  .sidebar.right {
+    order: 2;
+  }
+
+  .sidebar h1 {
+    color: var(--color-lighter);
+    font-size: var(--font-size-medium);
+  }
+
+  .sidebar.right h1 {
+    position: absolute;
+    top: 0.67em;
+    right: var(--padding-standard);
+  }
+
+  .main-content {
+    order: 3;
+  }
+
+  .main-content h1 {
+    margin-top: 0;
   }
 
   a {
