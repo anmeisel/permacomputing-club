@@ -48,10 +48,12 @@ A site to keep club updates, projects, notes and thoughts about permacomputing.
 -   Uses Are.na: https://www.are.na/london-permacomputing-club/channels
 -   HTML, CSS, TypeScript, Node
 -   Markdown rendering for richer text content
+-   Client-side JavaScript that takes tags to render relevant content
 
 ## Credits
 
 Some styling was used from [Elliott Cost's Memory Site](https://sites.elliott.computer/html-templates) which was inspired by [Piper Haywood](https://piperhaywood.com) and [Zinzy Waleson Geene](https://www.zinzy.website) websites.
+The `/#notes` and `/#events` navigation is inspired by the [sidenotes](https://gwern.net/sidenote) design approach suggested by @spacehobo.
 
 ## Project Structure
 
@@ -112,22 +114,14 @@ Uses a simple custom templating function called `renderTemplate` (`scripts/templ
 
 `pages`: Contains the specific content for each page type
 
-### Styling:
-
-CSS is completely separate in the `public/css` directory. Additional stylesheets can be added and linked as needed.
-
-### Client-side JavaScript:
-
-Separate JS files are in the `public/js` directory for any browser functionality.
-
 ## Customisation
 
 You can easily modify:
 
 -   The HTML structure by editing template files
--   The styling by editing CSS files
--   Add interactive features by updating the JavaScript file
--   Please discuss any proposed improvements or additions that go beyond basic styling or client-side functionality with the rest of the group before proceeding
+-   The styling by editing or adding CSS files
+-   Interactive features by updating the JavaScript file
+-   Please discuss any proposed improvements or additions that go beyond basic styling or functionality with the rest of the group before proceeding
 
 ### Adding packages
 
