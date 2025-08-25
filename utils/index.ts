@@ -333,11 +333,23 @@ export function processItemDescription(description: string): {
             );
           }
         }
-      } else if (key === "author") {
-        // Author value is a slug/username
-        metadataFields.push(
-          `<div class="description-field author-field"><span class="description-key">Author:</span> <a href="/${encodeURIComponent(value)}">${value}</a></div>`,
-        );
+      } else if (key === "author" || key === "authors") {
+        const authors = value
+          .split(",")
+          .map((author) => author.trim())
+          .filter((author) => author !== "");
+
+        if (authors.length > 0) {
+          const authorLinks = authors
+            .map(
+              (author) =>
+                `<a href="/${encodeURIComponent(author)}">${author}</a>`,
+            )
+            .join(", ");
+          metadataFields.push(
+            `<div class="description-field author-field"><span class="description-key">Author${authors.length > 1 ? "s" : ""}:</span> ${authorLinks}</div>`,
+          );
+        }
       }
     } else {
       // If it doesn't match a description format, add to markdown content
