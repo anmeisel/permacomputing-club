@@ -284,7 +284,7 @@ export function processItemDescription(description: string): {
     }
 
     // Check if the line matches a known metadata field
-    const metadataPattern = /^(pin|colour|tags|border|author):\s*(.+)$/i;
+    const metadataPattern = /^(pin|colour|tags|border|authors?):\s*(.+)$/i;
     const descriptionMatch = trimmedLine.match(metadataPattern);
 
     if (descriptionMatch) {
