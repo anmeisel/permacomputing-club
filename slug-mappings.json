@@ -41,10 +41,28 @@
     "class": "Text",
     "original_title": "Computer Movies"
   },
-  "loading": {
-    "id": 38074448,
-    "title": "loading",
+  "070725": {
+    "id": 38103814,
+    "title": "07.07.25",
     "class": "Text",
-    "original_title": ""
+    "original_title": "07.07.25"
+  },
+  "notes-for-2025-07-14": {
+    "id": 38144393,
+    "title": "Notes for 2025-07-14",
+    "class": "Text",
+    "original_title": "Notes for 2025-07-14"
+  },
+  "html-day": {
+    "id": 38332474,
+    "title": "HTML Day",
+    "class": "Text",
+    "original_title": "HTML Day"
+  },
+  "cms-multicropping-hackathon": {
+    "id": 38877892,
+    "title": "CMS Multicropping Hackathon",
+    "class": "Text",
+    "original_title": "CMS Multicropping Hackathon"
   }
 }

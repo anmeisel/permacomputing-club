@@ -169,7 +169,16 @@ export async function generateStaticPages(
     // Generate 404 page
     generate404Page(channelData, slugMap, templatesDir);
 
-    console.log(`Page generation completed at: ${new Date().toISOString()}`);
+    const completionTime = new Date().toLocaleString("en-GB", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      timeZoneName: "short",
+    });
+    console.log(`Page generation completed at: ${completionTime}`);
   } catch (err) {
     console.error("Error generating static pages:", err);
     throw err;
