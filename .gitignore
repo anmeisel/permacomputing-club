@@ -6,8 +6,6 @@
 # Lock files
 # ---------------
 
-.lock
-package-lock.json
 /node_modules
 
 # Editors
