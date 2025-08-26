@@ -4,7 +4,7 @@
 // 3. Only deploy if there's a change (or first run)
 // 4. Save the new count to cache
 
-const fetch = require("node-fetch");
+// No need for node-fetch import - using built-in fetch (Node.js 18+)
 const fs = require("fs").promises;
 const path = require("path");
 
