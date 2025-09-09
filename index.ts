@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import { ArenaService } from "./scripts/arena";
 import { Slug } from "./scripts/slug";
 import { generateStaticPages } from "./build";
+import { generateRSSFeed } from "./utils/rss";
 
 dotenv.config();
 
@@ -54,6 +55,12 @@ export async function buildStaticSite(): Promise<void> {
 
     // Generate static pages
     await generateStaticPages(channelData, slugMap, SOURCE_DIR);
+
+    const rssContent = generateRSSFeed(
+      channelData,
+      "https://london.permacomputing.net",
+    );
+    fs.writeFileSync(path.join(__dirname, "build", "rss.xml"), rssContent);
 
     return;
   } catch (err) {
