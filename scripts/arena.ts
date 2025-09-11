@@ -34,7 +34,7 @@ export class ArenaService {
       console.log(
         `Fetching fresh Arena data with aggressive cache buster: ${new Date().toISOString()}`,
       );
-      console.log(`🔗 URL: ${cacheBusterUrl}`);
+      console.log(`URL: ${cacheBusterUrl}`);
 
       // Direct fetch request with aggressive cache busting
       const response = await fetch(cacheBusterUrl, {
@@ -62,23 +62,7 @@ export class ArenaService {
       console.log(
         `Successfully fetched ${chan.contents?.length || 0} items from Arena`,
       );
-      console.log(`📅 Last updated: ${chan.updated_at || "Unknown"}`);
-
-      // item IDs and their update times for debugging
-      if (chan.contents && chan.contents.length > 0) {
-        const sampleItems = chan.contents.slice(0, 3);
-        console.log("Sample items for debugging:");
-        sampleItems.forEach((item) => {
-          console.log(
-            `  - Item ${item.id}: updated ${item.updated_at || "Unknown"}`,
-          );
-          if (item.description) {
-            console.log(
-              `    Description preview: ${item.description.substring(0, 100)}...`,
-            );
-          }
-        });
-      }
+      console.log(`Last updated: ${chan.updated_at || "Unknown"}`);
 
       return chan;
     } catch (err) {

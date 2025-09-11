@@ -1,8 +1,8 @@
 :root {
   --font-family: Times;
   --font-size-small: 10px;
-  --font-size-medium: 15px;
-  --font-size: 20px;
+  --font-size-medium: 14px;
+  --font-size: 17px;
   --line-height: 1.5;
   --color-text: #3f3f3f;
   --color-lighter: #666;
@@ -37,11 +37,25 @@ nav {
   padding: var(--padding-standard);
 }
 
+header {
+  display: flex;
+  gap: var(--padding-standard);
+  padding: 0 var(--padding-standard) 0 var(--padding-standard);
+}
+
+header a,
+header p {
+  font-size: var(--font-size-small);
+  line-height: initial;
+  margin: 0;
+}
+
 main {
   display: flex;
   gap: var(--padding-standard);
   margin: 0 auto;
-  padding: var(--padding-standard);
+  padding: 0 var(--padding-standard) var(--padding-standard)
+    var(--padding-standard);
 }
 
 .sidebar {
@@ -182,7 +196,6 @@ footer {
   margin-top: 30px;
 }
 
-.size,
 .no-results-message {
   margin: var(--padding-standard);
 }
