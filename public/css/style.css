@@ -213,6 +213,15 @@ footer {
     padding-top: 0;
   }
 
+  header {
+    padding-top: var(--padding-standard);
+  }
+
+  header a,
+  header p {
+    font-size: var(--font-size-medium);
+  }
+
   main {
     flex-direction: column;
     gap: 0;
