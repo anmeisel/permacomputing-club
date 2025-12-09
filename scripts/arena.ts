@@ -13,54 +13,26 @@ export class ArenaService {
   }
 
   /**
-   * Fetches the latest data from the Arena channel with aggressive cache busting (not working)
+   * Fetches the latest data from the Arena channel with cache busting
    * @returns Promise resolving to ArenaChannel data
    */
   async fetchChannelData(): Promise<ArenaChannel> {
     const timestamp = Date.now();
-    const randomId = Math.random().toString(36).substring(7);
 
     try {
-      // Multiple cache-busting strategies...
-      const cacheBusterParams = new URLSearchParams({
-        _t: timestamp.toString(),
-        _r: randomId,
-        cache: "false",
-        v: timestamp.toString(),
-      });
+      console.log(`Fetching fresh Arena data: ${new Date().toISOString()}`);
 
-      const cacheBusterUrl = `https://api.are.na/v2/channels/${this.channelSlug}?${cacheBusterParams.toString()}`;
+      // Use the official Arena client - it handles API calls properly
+      const arena = new Arena({ accessToken: this.accessToken });
 
-      console.log(
-        `Fetching fresh Arena data with aggressive cache buster: ${new Date().toISOString()}`,
-      );
-      console.log(`URL: ${cacheBusterUrl}`);
-
-      // Direct fetch request with aggressive cache busting
-      const response = await fetch(cacheBusterUrl, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`,
-          "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
-          Pragma: "no-cache",
-          Expires: "0",
-          "If-None-Match": "*",
-          "If-Modified-Since": new Date(0).toUTCString(),
-          "User-Agent": `arena-site-builder-${timestamp}`,
-        },
-        cache: "no-store",
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          `Arena API responded with status: ${response.status} - ${response.statusText}`,
-        );
-      }
-
-      const chan = (await response.json()) as ArenaChannel;
+      // The Arena API doesn't respect cache-control headers the way you're trying to use them
+      // Instead, just fetch directly - the API always returns fresh data
+      const chan = (await arena
+        .channel(this.channelSlug)
+        .get()) as ArenaChannel;
 
       console.log(
-        `Successfully fetched ${chan.contents?.length || 0} items from Arena`,
+        `Successfully fetched ${chan.contents?.length || 0} items from Arena`
       );
       console.log(`Last updated: ${chan.updated_at || "Unknown"}`);
 
@@ -68,25 +40,34 @@ export class ArenaService {
     } catch (err) {
       console.error("Error fetching channel:", err);
 
-      // if direct fetch fails
-      console.log("Falling back to regular are.na client...");
+      // Try one more time with a direct fetch as fallback
       try {
-        const freshArena = new Arena({ accessToken: this.accessToken });
-        const chan = (await freshArena
-          .channel(this.channelSlug)
-          .get()) as ArenaChannel;
+        const url = `https://api.are.na/v2/channels/${this.channelSlug}`;
 
-        console.log(`Fetched ${chan.contents?.length || 0} items`);
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${this.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Arena API responded with status: ${response.status}`
+          );
+        }
+
+        const chan = (await response.json()) as ArenaChannel;
+        console.log(`Fallback successful: ${chan.contents?.length || 0} items`);
         return chan;
       } catch (fallbackErr) {
-        console.error("Fallback also failed:", fallbackErr);
-        if (err instanceof Error) {
-          throw new Error(
-            `Failed to fetch Are.na channel data: ${err.message}`,
-          );
-        } else {
-          throw new Error("Failed to fetch Are.na channel data: Unknown error");
-        }
+        console.error("Both attempts failed:", fallbackErr);
+        throw new Error(
+          `Failed to fetch Are.na channel data: ${
+            err instanceof Error ? err.message : "Unknown error"
+          }`
+        );
       }
     }
   }
@@ -99,6 +80,11 @@ export class ArenaService {
   createSlugMap(channel: ArenaChannel): Map<string, ArenaItem> {
     const slugMap = new Map<string, ArenaItem>();
 
+    if (!channel.contents || !Array.isArray(channel.contents)) {
+      console.warn("No contents found in channel");
+      return slugMap;
+    }
+
     channel.contents.forEach((item: ArenaItem) => {
       let slugSource = "";
 
@@ -110,7 +96,10 @@ export class ArenaService {
       else if (item.content && item.content.trim() !== "") {
         slugSource = item.content;
         console.log(
-          `No title, using content for slug: "${item.content.substring(0, 30)}..."`,
+          `No title, using content for slug: "${item.content.substring(
+            0,
+            30
+          )}..."`
         );
       }
       // Last resort - use ID with untitled prefix
@@ -123,6 +112,7 @@ export class ArenaService {
       slugMap.set(slug, item);
     });
 
+    console.log(`Created slug map with ${slugMap.size} entries`);
     return slugMap;
   }
 }
