@@ -1,0 +1,30 @@
+# Entangled Configuration for Permacomputing Club
+# https://entangled.github.io/
+
+version = "2.0"
+
+# Watch markdown files in the docs directory
+watch_list = ["docs/**/*.md"]
+
+# TypeScript/JavaScript configuration
+[[languages]]
+name = "TypeScript"
+identifiers = ["typescript", "ts"]
+comment = { open = "//" }
+
+[[languages]]
+name = "JavaScript"
+identifiers = ["javascript", "js"]
+comment = { open = "//" }
+
+# HTML templates
+[[languages]]
+name = "HTML"
+identifiers = ["html"]
+comment = { open = "<!--", close = "-->" }
+
+# CSS
+[[languages]]
+name = "CSS"
+identifiers = ["css"]
+comment = { open = "/*", close = "*/" }

@@ -1,5 +1,43 @@
-// ~/~ begin <<docs/build-system.md#build.ts>>[init]
-// ~/~ begin <<docs/build-system.md#build-imports>>[init]
+# Static Site Build System
+
+This document explains the build system for the Permacomputing Club website using literate programming with Entangled.
+
+## Overview
+
+The build system generates static HTML pages from Arena channel data. It follows a simple pipeline:
+
+1. Prepare the build directory
+2. Copy static assets (CSS, JS)
+3. Generate HTML pages (home, items, 404)
+4. Measure page sizes
+
+## Main Build File
+
+The core build functionality is organized into a set of functions that work together to generate the static site.
+
+``` {.typescript file=build.ts}
+<<build-imports>>
+
+<<build-constants>>
+
+<<prepare-build-directory>>
+
+<<copy-static-assets>>
+
+<<generate-home-page>>
+
+<<generate-item-pages>>
+
+<<generate-404-page>>
+
+<<generate-static-pages>>
+```
+
+### Imports and Setup
+
+We need several Node.js modules and our custom types and utilities:
+
+``` {.typescript #build-imports}
 import path from "path";
 import fs from "fs";
 import { ArenaChannel, ArenaItem } from "./types/arena-types";
@@ -10,56 +48,78 @@ import {
 } from "./scripts/template";
 import { copyDirectory } from "./utils/file";
 import { measurePageSize } from "./utils/size";
-// ~/~ end
+```
 
-// ~/~ begin <<docs/build-system.md#build-constants>>[init]
+The build directory is where all generated files go:
+
+``` {.typescript #build-constants}
 const BUILD_DIR = path.resolve(process.cwd(), "build");
-// ~/~ end
+```
 
-// ~/~ begin <<docs/build-system.md#prepare-build-directory>>[init]
+## Build Directory Preparation
+
+Before building, we need a clean workspace. This function ensures the build directory exists and is empty (excluding version control).
+
+``` {.typescript #prepare-build-directory}
 /**
  * Ensures the build directory exists and is empty
  */
 export function prepareBuildDirectory(): void {
-  // ~/~ begin <<docs/build-system.md#check-or-create-build-dir>>[init]
-  // Create build directory if it doesn't exist
-  if (!fs.existsSync(BUILD_DIR)) {
-    try {
-      fs.mkdirSync(BUILD_DIR, { recursive: true });
+  <<check-or-create-build-dir>>
 
-      // Verify directory was created
-      if (!fs.existsSync(BUILD_DIR)) {
-        console.error(`error`);
-        throw new Error("Build directory creation failed silently");
-      }
-    } catch (err) {
-      console.error(`Error creating build directory:`, err);
-      throw err;
-    }
-  } else {
-    // Clear existing build directory content
-    fs.readdirSync(BUILD_DIR).forEach((file) => {
-      const filePath = path.join(BUILD_DIR, file);
-      if (file !== "node_modules" && file !== ".git") {
-        if (fs.lstatSync(filePath).isDirectory()) {
-          fs.rmSync(filePath, { recursive: true, force: true });
-        } else {
-          fs.unlinkSync(filePath);
-        }
-      }
-    });
-  }
-  // ~/~ end
-
-  // ~/~ begin <<docs/build-system.md#create-public-subdirs>>[init]
-  // Create public directories in build
-  const publicBuildDir = path.join(BUILD_DIR, "public");
-  fs.mkdirSync(publicBuildDir, { recursive: true });
-  // ~/~ end
+  <<create-public-subdirs>>
 }
-// ~/~ end
+```
 
-// ~/~ begin <<docs/build-system.md#copy-static-assets>>[init]
+### Directory Creation Logic
+
+If the directory doesn't exist, create it. Otherwise, clear its contents:
+
+``` {.typescript #check-or-create-build-dir}
+// Create build directory if it doesn't exist
+if (!fs.existsSync(BUILD_DIR)) {
+  try {
+    fs.mkdirSync(BUILD_DIR, { recursive: true });
+
+    // Verify directory was created
+    if (!fs.existsSync(BUILD_DIR)) {
+      console.error(`error`);
+      throw new Error("Build directory creation failed silently");
+    }
+  } catch (err) {
+    console.error(`Error creating build directory:`, err);
+    throw err;
+  }
+} else {
+  // Clear existing build directory content
+  fs.readdirSync(BUILD_DIR).forEach((file) => {
+    const filePath = path.join(BUILD_DIR, file);
+    if (file !== "node_modules" && file !== ".git") {
+      if (fs.lstatSync(filePath).isDirectory()) {
+        fs.rmSync(filePath, { recursive: true, force: true });
+      } else {
+        fs.unlinkSync(filePath);
+      }
+    }
+  });
+}
+```
+
+### Public Directory Structure
+
+Create the necessary subdirectories for static assets:
+
+``` {.typescript #create-public-subdirs}
+// Create public directories in build
+const publicBuildDir = path.join(BUILD_DIR, "public");
+fs.mkdirSync(publicBuildDir, { recursive: true });
+```
+
+## Static Assets
+
+CSS, JavaScript, and other static files need to be copied to the build directory:
+
+``` {.typescript #copy-static-assets}
 /**
  * Copies static assets to the build directory
  * @param srcDir Source directory for static assets
@@ -68,9 +128,15 @@ export function copyStaticAssets(srcDir: string): void {
   // Copy static assets to the build root
   copyDirectory(path.join(srcDir, "public"), BUILD_DIR);
 }
-// ~/~ end
+```
 
-// ~/~ begin <<docs/build-system.md#generate-home-page>>[init]
+## Page Generation
+
+### Home Page
+
+The home page lists all content in reverse chronological order:
+
+``` {.typescript #generate-home-page}
 /**
  * Generates the home page and writes it to the build directory
  * @param channelData Channel data from Arena
@@ -91,9 +157,13 @@ export async function generateHomePage(
   // Measure and update page size
   measurePageSize(homeFilePath);
 }
-// ~/~ end
+```
 
-// ~/~ begin <<docs/build-system.md#generate-item-pages>>[init]
+### Individual Item Pages
+
+Each Arena block gets its own page with a clean URL structure:
+
+``` {.typescript #generate-item-pages}
 /**
  * Generates item pages and writes them to the build directory
  * @param slugMap Map of slugs to ArenaItems
@@ -126,9 +196,13 @@ export async function generateItemPages(
     measurePageSize(itemFilePath);
   }
 }
-// ~/~ end
+```
 
-// ~/~ begin <<docs/build-system.md#generate-404-page>>[init]
+### 404 Error Page
+
+Handle missing pages gracefully:
+
+``` {.typescript #generate-404-page}
 /**
  * Generates the 404 page and writes it to the build directory
  * @param channelData Channel data from Arena
@@ -149,9 +223,13 @@ export function generate404Page(
   // Measure and update page size
   measurePageSize(notFoundFilePath);
 }
-// ~/~ end
+```
 
-// ~/~ begin <<docs/build-system.md#generate-static-pages>>[init]
+## Orchestration
+
+The main function ties everything together:
+
+``` {.typescript #generate-static-pages}
 /**
  * Main function to generate all static pages
  * @param channelData Channel data from Arena
@@ -202,5 +280,14 @@ export async function generateStaticPages(
     throw err;
   }
 }
-// ~/~ end
-// ~/~ end
+```
+
+## Usage
+
+This module is imported and used by the main entry point (`index.ts`) which:
+
+1. Fetches data from the Are.na channel
+2. Generates slug mappings for clean URLs
+3. Calls `generateStaticPages()` with the channel data
+
+The generated static site can then be deployed to any static hosting service.

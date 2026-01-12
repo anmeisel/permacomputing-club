@@ -1,16 +1,23 @@
+// ~/~ begin <<docs/file-utilities.md#utils/file.ts>>[init]
+// ~/~ begin <<docs/file-utilities.md#file-imports>>[init]
 import fs from "fs";
 import path from "path";
+// ~/~ end
 
+// ~/~ begin <<docs/file-utilities.md#copy-directory>>[init]
 /**
  * Copies a directory recursively
  * @param src Source directory path
  * @param dest Destination directory path
  */
 export function copyDirectory(src: string, dest: string): void {
+  // ~/~ begin <<docs/file-utilities.md#ensure-destination-exists>>[init]
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest, { recursive: true });
   }
+  // ~/~ end
 
+  // ~/~ begin <<docs/file-utilities.md#iterate-and-copy-entries>>[init]
   const entries = fs.readdirSync(src, { withFileTypes: true });
 
   for (const entry of entries) {
@@ -23,8 +30,11 @@ export function copyDirectory(src: string, dest: string): void {
       fs.copyFileSync(srcPath, destPath);
     }
   }
+  // ~/~ end
 }
+// ~/~ end
 
+// ~/~ begin <<docs/file-utilities.md#ensure-directory>>[init]
 /**
  * Ensures a directory exists, creating it if necessary
  * @param dir Directory path
@@ -41,7 +51,9 @@ export function ensureDirectoryExists(dir: string): boolean {
     return false;
   }
 }
+// ~/~ end
 
+// ~/~ begin <<docs/file-utilities.md#clear-directory>>[init]
 /**
  * Clears all contents of a directory without removing the directory itself
  * @param dir Directory path
@@ -65,7 +77,9 @@ export function clearDirectory(dir: string, excludes: string[] = []): void {
     }
   });
 }
+// ~/~ end
 
+// ~/~ begin <<docs/file-utilities.md#write-file-with-dirs>>[init]
 /**
  * Writes content to a file, creating any necessary directories
  * @param filePath Path to write the file
@@ -76,3 +90,5 @@ export function writeFileWithDirs(filePath: string, content: string): void {
   ensureDirectoryExists(dir);
   fs.writeFileSync(filePath, content, "utf8");
 }
+// ~/~ end
+// ~/~ end
