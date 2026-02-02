@@ -2,17 +2,20 @@
 
 A site to keep club updates, projects, notes and thoughts about permacomputing.
 
+> [!NOTE]
+> This repo is no longer in use. We have moved to [sourcehut](https://sr.ht/~anmeisel/perma-website/) and away from Vercel + GitHub.
+
 ## Features
 
--   Pulls content from closed Are.na channel via API token. CMS: https://www.are.na/london-permacomputing-club/permacomputing-club
--   Simple HTML pages for each block
--   Saves slug mappings to enable efficient rebuilds
--   Homepage displaying all posts in reverse chronological order
--   Tags for creating connections between posts
--   Supports Text, Image, and Link block types
--   Markdown support for text content
--   Static site generation for easy hosting and minimal resource usage
--   Page size measuring of the static build
+- Pulls content from closed Are.na channel via API token. CMS: https://www.are.na/london-permacomputing-club/permacomputing-club
+- Simple HTML pages for each block
+- Saves slug mappings to enable efficient rebuilds
+- Homepage displaying all posts in reverse chronological order
+- Tags for creating connections between posts
+- Supports Text, Image, and Link block types
+- Markdown support for text content
+- Static site generation for easy hosting and minimal resource usage
+- Page size measuring of the static build
 
 ## Setup
 
@@ -38,17 +41,17 @@ A site to keep club updates, projects, notes and thoughts about permacomputing.
 
 ### Scripts
 
--   `npm run build` - Build the static site
--   `npm run preview` - Serve the static site locally and open in browser
--   `npm run build:preview` - Build and then immediately preview the site
--   `npm run clean` - Remove build and dist directories
+- `npm run build` - Build the static site
+- `npm run preview` - Serve the static site locally and open in browser
+- `npm run build:preview` - Build and then immediately preview the site
+- `npm run clean` - Remove build and dist directories
 
 ## Technical Details
 
--   Uses Are.na: https://www.are.na/london-permacomputing-club/channels
--   HTML, CSS, TypeScript, Node
--   Markdown rendering for richer text content
--   Client-side JavaScript that takes tags to render relevant content
+- Uses Are.na: https://www.are.na/london-permacomputing-club/channels
+- HTML, CSS, TypeScript, Node
+- Markdown rendering for richer text content
+- Client-side JavaScript that takes tags to render relevant content
 
 ## Credits
 
@@ -102,11 +105,11 @@ permacomputing-club/
 
 Uses a simple custom templating function called `renderTemplate` (`scripts/template.ts`) with variable substitution. Here we render content into the `views` templates.
 
--   Supports partials with `{{> partial_name}}` syntax
--   Variables use `{{ variable_name }}` syntax
--   Text content is rendered as Markdown for rich formatting
--   Link descriptions also support Markdown formatting
--   Images and other content types are rendered appropriately
+- Supports partials with `{{> partial_name}}` syntax
+- Variables use `{{ variable_name }}` syntax
+- Text content is rendered as Markdown for rich formatting
+- Link descriptions also support Markdown formatting
+- Images and other content types are rendered appropriately
 
 ### File Organisation:
 
@@ -118,10 +121,10 @@ Uses a simple custom templating function called `renderTemplate` (`scripts/templ
 
 You can easily modify:
 
--   The HTML structure by editing template files
--   The styling by editing or adding CSS files
--   Interactive features by updating the JavaScript file
--   Please discuss any proposed improvements or additions that go beyond basic styling or functionality with the rest of the group before proceeding
+- The HTML structure by editing template files
+- The styling by editing or adding CSS files
+- Interactive features by updating the JavaScript file
+- Please discuss any proposed improvements or additions that go beyond basic styling or functionality with the rest of the group before proceeding
 
 ### Adding packages
 
@@ -148,17 +151,17 @@ Our Vercel project is connected to this repository, so every time you make a pus
 
 This roadmap is a living document meant to evolve with our collective knowledge and priorities. If you have ideas that match [permacomputing principles](https://permacomputing.net/Principles/) or technical improvements to suggest, please:
 
--   Share your thoughts during club meetings
--   Submit proposals via pull requests
--   Add notes to the following points in this README
--   Experiment with implementations and share your findings
+- Share your thoughts during club meetings
+- Submit proposals via pull requests
+- Add notes to the following points in this README
+- Experiment with implementations and share your findings
 
 ### Infrastructure & Hosting
 
--   Migrate to self-hosted local server infrastructure to reduce dependency on cloud services (@pelinski is currently working on this!)
--   Implement low-power computing strategies. For example, Vercel triggers a deploy per repo push, which is not ecological
--   Explore offline-first functionality using Service Workers
--   Investigate peer-to-peer content sharing
+- Migrate to self-hosted local server infrastructure to reduce dependency on cloud services (@pelinski is currently working on this!)
+- Implement low-power computing strategies. For example, Vercel triggers a deploy per repo push, which is not ecological
+- Explore offline-first functionality using Service Workers
+- Investigate peer-to-peer content sharing
 
 ### Content Management
 
@@ -166,13 +169,13 @@ This roadmap is a living document meant to evolve with our collective knowledge 
 2. Transition from Are.na to decentralised content networks:
     - Integrate with ActivityPub/Fediverse (Mastodon API) for federated content sharing
     - Explore distributed content storage
-    - Consider implementing a simple git-based CMS for version control and offline editing
+    - [x] Consider implementing a simple git-based CMS for version control and offline editing → Done (see resopnse to [this issue](https://github.com/anmeisel/permacomputing-club/issues/1#issuecomment-3834581749))
 
 ### Media Handling
 
--   Create a script that automatically dithers all images to reduce file size and energy consumption
--   Implement responsive image loading with multiple resolutions based on device capabilities
--   Add WebP/AVIF conversion with fallbacks for broader compatibility
+- Create a script that automatically dithers all images to reduce file size and energy consumption
+- Implement responsive image loading with multiple resolutions based on device capabilities
+- Add WebP/AVIF conversion with fallbacks for broader compatibility
 
 ### Performance & Accessibility
 
@@ -185,6 +188,6 @@ This roadmap is a living document meant to evolve with our collective knowledge 
 
 ### Documentation & Community
 
--   Document the carbon footprint of the website and accessibility audits
--   Create community contribution guidelines
--   Develop a template version others can easily fork and customise
+- Document the carbon footprint of the website and accessibility audits
+- Create community contribution guidelines
+- Develop a template version others can easily fork and customise
