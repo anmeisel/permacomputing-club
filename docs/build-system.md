@@ -1,10 +1,10 @@
 # Static Site Build System
 
-This document explains the build system for the Permacomputing Club website using literate programming with Entangled.
+This document explains the build system to create static pages for the Permacomputing Club website.
 
 ## Overview
 
-The build system generates static HTML pages from Arena channel data. It follows a simple pipeline:
+The build system generates static HTML pages from Are.na channel data. It follows this pipeline:
 
 1. Prepare the build directory
 2. Copy static assets (CSS, JS)

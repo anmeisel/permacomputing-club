@@ -2,13 +2,11 @@
 
 A collection of Node.js filesystem utilities for managing the build process.
 
-## Design Philosophy
+## Design philosophy that aims to follow permacomputing principles:
 
-These utilities follow permacomputing principles:
-
-- **Simple**: Pure functions with clear inputs and outputs
-- **Efficient**: No unnecessary dependencies or complex abstractions
-- **Resilient**: Graceful error handling and validation
+- Pure functions with clear inputs and outputs
+- No unnecessary dependencies or complex abstractions
+- Graceful error handling and validation for resilience
 
 ## The Module
 
@@ -98,7 +96,7 @@ export function ensureDirectoryExists(dir: string): boolean {
 }
 ```
 
-This function is **defensive**: it catches errors and returns a boolean rather than throwing, making it safer to use in build scripts.
+This function is **defensive** because it catches errors and returns a boolean rather than throwing, making it safer to use in build scripts.
 
 ## Clearing Directories
 
@@ -167,8 +165,6 @@ writeFileWithDirs("build/about/index.html", htmlContent);
 ```
 
 ## Future Improvements
-
-Potential enhancements aligned with permacomputing principles:
 
 - Add file size tracking to monitor build efficiency
 - Implement incremental copying (only changed files)
